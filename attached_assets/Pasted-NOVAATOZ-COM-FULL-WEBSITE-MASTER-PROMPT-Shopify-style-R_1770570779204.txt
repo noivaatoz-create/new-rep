@@ -1,0 +1,205 @@
+NOVAATOZ.COM — FULL WEBSITE MASTER PROMPT (Shopify-style)
+Role: You are a senior full-stack engineer + UI/UX designer. Build a production-ready ecommerce website for novaatoz.com that sells Water Flossers. It must look premium, modern, and “crazy cool” like a top DTC brand.
+1) Brand + Design Direction
+Brand name: Novaatoz
+Niche: Water Flossers / Oral Care Tech
+Visual vibe: futuristic, clean, premium, “Apple meets Cyber-minimal DTC”
+Colors: dark base + neon accents OR clean white + electric blue accents (choose best)
+Typography: modern sans, high readability
+Motion: smooth micro-animations, hover effects, scroll reveal, product image parallax
+Must be fully responsive (mobile-first)
+2) Tech Stack (Choose One & Implement)
+Option A (Recommended):
+Frontend: Next.js (App Router) + TypeScript + Tailwind
+Backend: Next.js API routes
+Database: PostgreSQL (Prisma ORM)
+Auth: NextAuth (email/password + OAuth optional)
+Payments: Stripe Checkout + PayPal Checkout
+Email: Resend or SendGrid
+Hosting: Vercel + Postgres (Supabase/Neon)
+Option B (If simpler):
+Frontend: React + Vite
+Backend: Node/Express
+DB: Postgres + Prisma
+3) Core Ecommerce Features (Must Have)
+Storefront
+Home page (hero, value props, best sellers, reviews, comparison section)
+Product listing (collections: “Best Sellers”, “Portable”, “Family”, “Accessories”)
+Product detail page:
+image gallery + zoom
+price, variants, stock status
+shipping estimate
+FAQ accordion
+trust badges
+upsells (“Extra tips pack”, “Travel pouch”)
+Cart drawer (slide-in mini cart)
+Full cart page (discount code, shipping estimate, upsells)
+Checkout:
+Stripe Checkout
+PayPal Checkout
+Taxes + shipping calculated
+Account pages:
+login/signup
+order history
+saved addresses
+Search (instant search with suggestions)
+Wishlist (optional but nice)
+Admin Panel (Secure, No Backdoors)
+Admin login at /admin
+Role-based access:
+Owner (full access)
+Admin (catalog + orders)
+Support (orders + refunds)
+Marketing (coupons + content)
+Security requirements:
+hashed passwords (bcrypt/argon2)
+2FA for Owner role
+rate limiting for login
+audit logs (who changed what + when)
+password reset via email token (no hardcoded password)
+Admin Features
+Dashboard:
+sales today/week/month
+revenue, orders count, AOV
+conversion tracking placeholder
+Products management:
+add/edit/delete products
+variants (color, model)
+SKU, stock, low-stock alerts
+image upload
+Orders management:
+view orders, status (paid/packed/shipped/delivered/refunded)
+create shipments (tracking number + carrier)
+print packing slip
+Payments:
+show Stripe + PayPal payment statuses
+refunds flow (via Stripe/PayPal APIs where possible)
+Shipping:
+shipping zones & rates
+integration-ready structure (Shippo/EasyPost optional)
+Coupons & promotions:
+% off / fixed discount / free shipping
+expiry date, min cart value
+Content manager:
+homepage sections editable
+FAQ, policies editable
+Customers:
+customer list + order history
+Analytics:
+sales by product
+repeat customers
+inventory valuation
+4) Pages Required (Site Map)
+Public
+/ Home
+/shop All products
+/product/[slug]
+/collections/[name]
+/cart
+/checkout (redirects to Stripe/PayPal)
+/about
+/contact
+/faq
+/reviews
+/shipping-returns
+/privacy-policy
+/terms
+/track-order
+/blog + /blog/[slug] (optional but good for SEO)
+Auth
+/login
+/signup
+/account
+Admin
+/admin
+/admin/products
+/admin/orders
+/admin/customers
+/admin/discounts
+/admin/settings
+/admin/content
+5) Product Catalog Starter Content (Create Seed Data)
+Create at least 4 products:
+Novaatoz JetClean Pro (premium cordless)
+Novaatoz TravelPulse Mini (portable)
+Novaatoz FamilyTank XL (big reservoir)
+Replacement Tip Pack (8pcs)
+Include:
+prices
+short + long descriptions
+benefits bullets
+specs (pressure levels, battery, water tank size, modes)
+what’s in box
+warranty info (1 year)
+images as placeholders (use local /public placeholders)
+6) Checkout + Payments (Implementation Requirements)
+Stripe:
+Products synced or created in DB and charged through Stripe Checkout session
+Webhooks:
+checkout.session.completed → mark order paid
+charge.refunded → mark refunded
+PayPal:
+PayPal JS SDK checkout button
+On success → create order in DB and mark paid
+Order record must include:
+order id
+customer info
+items, qty, price
+shipping address
+payment provider + transaction id
+status timeline
+7) Shipping + Tax Logic
+Shipping:
+flat rate + free shipping threshold (e.g., free above $75)
+allow multiple zones (Canada, USA, International)
+Tax:
+simple tax rates per region (config in admin settings)
+keep structure ready for real tax engine later
+8) Emails (Automated)
+Send emails:
+Order confirmation
+Shipping confirmation (with tracking)
+Password reset
+Refund confirmation
+9) SEO + Performance
+Fast load, optimized images
+Meta tags per page
+Product schema (JSON-LD)
+Sitemap.xml + robots.txt
+Clean URLs, canonical tags
+10) Legal + Policies
+Include editable policy pages:
+Shipping & Returns
+Privacy
+Terms
+Warranty
+Contact support info
+11) DevOps + Environment
+Use .env for all secrets:
+DATABASE_URL
+NEXTAUTH_SECRET
+STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET
+PAYPAL_CLIENT_ID
+PAYPAL_SECRET
+EMAIL_API_KEY
+Provide:
+database schema (Prisma)
+migration steps
+seed script
+local run instructions
+deployment instructions (Vercel)
+12) Deliverables
+Full codebase
+Working admin panel (secure)
+Stripe + PayPal working in test mode
+Orders + inventory tracked in DB
+A premium animated UI
+⚡ Extra “Crazy Cool Design” Add-On Prompt (optional)
+Add these UI effects tastefully:
+animated gradient glow behind hero product
+3D tilt on product cards
+smooth scroll reveal sections
+sticky “Buy Now” CTA on mobile product page
+interactive comparison table (Novaatoz vs Regular Floss)
+live “pressure mode” selector UI demo (visual)

@@ -1,0 +1,1180 @@
+<!-- Novaatoz Homepage: Premium Oral Tech -->
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Novaatoz - The Future of Oral Care</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#256af4",
+                        "primary-hover": "#1d52c4",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                        "card-dark": "#182234",
+                        "border-dark": "#222f49",
+                        "text-muted": "#90a4cb",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(24, 34, 52, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glow-text {
+            text-shadow: 0 0 20px rgba(37, 106, 244, 0.5);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white antialiased overflow-x-hidden">
+<div class="relative flex min-h-screen flex-col">
+<!-- Navigation -->
+<header class="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-border-dark glass-panel">
+<div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl">water_drop</span>
+<span class="text-xl font-bold tracking-tight text-white">NOVAATOZ</span>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium text-slate-300 hover:text-white transition-colors" href="#">Shop</a>
+<a class="text-sm font-medium text-slate-300 hover:text-white transition-colors" href="#">Technology</a>
+<a class="text-sm font-medium text-slate-300 hover:text-white transition-colors" href="#">About</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white transition-all hover:bg-primary-hover hover:shadow-[0_0_15px_rgba(37,106,244,0.5)]">
+                        Buy Now
+                    </button>
+<button class="md:hidden text-white">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-1">
+<!-- Hero Section -->
+<section class="relative overflow-hidden py-20 sm:py-32 lg:pb-32 xl:pb-36">
+<!-- Background Gradient Effect -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-primary/20 rounded-full blur-[120px] -z-10"></div>
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+<div class="grid lg:grid-cols-2 gap-12 items-center">
+<div class="flex flex-col gap-6 max-w-2xl">
+<div class="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary w-fit">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+                                New JetClean Pro Released
+                            </div>
+<h1 class="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] text-white">
+                                The Future of <br/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-white glow-text">Oral Care</span>
+</h1>
+<p class="text-lg text-text-muted max-w-lg leading-relaxed">
+                                Experience the precision of the JetClean Pro. Clinical-grade hygiene in a cyber-minimalist shell designed for the modern bathroom.
+                            </p>
+<div class="flex flex-wrap gap-4 pt-4">
+<button class="flex items-center justify-center rounded-lg bg-primary h-12 px-8 text-base font-bold text-white transition-all hover:bg-primary-hover hover:scale-105 shadow-[0_0_20px_rgba(37,106,244,0.4)]">
+                                    Shop the Future
+                                </button>
+<button class="flex items-center justify-center rounded-lg border border-border-dark bg-card-dark/50 h-12 px-8 text-base font-medium text-white transition-all hover:bg-card-dark hover:border-primary/50">
+                                    Watch Demo
+                                </button>
+</div>
+</div>
+<div class="relative lg:h-[600px] flex items-center justify-center">
+<!-- Abstract circle decorations -->
+<div class="absolute w-[400px] h-[400px] border border-primary/20 rounded-full animate-[spin_10s_linear_infinite]"></div>
+<div class="absolute w-[500px] h-[500px] border border-white/5 rounded-full"></div>
+<!-- Product Image Placeholder -->
+<div class="relative z-10 w-full max-w-md aspect-[3/4] rounded-2xl bg-gradient-to-b from-gray-800 to-black p-1 shadow-2xl ring-1 ring-white/10">
+<div class="h-full w-full rounded-xl bg-card-dark overflow-hidden relative">
+<img alt="Sleek electric toothbrush device floating in dark space with blue rim lighting" class="h-full w-full object-cover opacity-80 mix-blend-overlay" data-alt="Futuristic water flosser device floating in dark void" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3G8UovR-lqU24If8Oypo9fgivPu1Xoc0hGJVvPr7iANCtDni4rP9b6Y1XTx-UaMdT2YKUT706FCmw1w4GjTOjOakw5Kcs6GRNvCGhlfRmC4FkDi4ebC_gR_jeD_yvFJJVtufwXnEz7Ml3wyTSHxcg2VEjbboguYj3jOYaVsfh0pcOJK0W_2AZBDIqDnsKjgLAWN6bnJnkRMKOhvEihz_FSfaVFlPMHIUgVcZa4tvxRDnCXUgln0yyOoJl0YcI0Me-zUT3-t-2MW44"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent opacity-60"></div>
+<div class="absolute bottom-8 left-8 right-8">
+<div class="flex justify-between items-end">
+<div>
+<p class="text-primary text-sm font-bold tracking-widest uppercase">Series X</p>
+<h3 class="text-white text-2xl font-bold">JetClean Pro</h3>
+</div>
+<div class="h-10 w-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center">
+<span class="material-symbols-outlined text-white">arrow_forward</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Value Props Section -->
+<section class="py-24 bg-background-dark relative">
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+<div class="mb-16 md:flex md:items-end md:justify-between">
+<div class="max-w-2xl">
+<h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-4">Why Novaatoz?</h2>
+<p class="text-text-muted text-lg">Advanced engineering for a superior clean. We've stripped away the unnecessary to focus on pure performance.</p>
+</div>
+<a class="hidden md:flex items-center gap-1 text-primary font-medium hover:text-primary-hover mt-4 md:mt-0" href="#">
+                            View full specs <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Feature 1 -->
+<div class="group relative overflow-hidden rounded-xl border border-border-dark bg-card-dark p-8 transition-all hover:border-primary/50 hover:shadow-lg">
+<div class="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-3xl">waves</span>
+</div>
+<h3 class="mb-2 text-xl font-bold text-white">Hyper-Pulse Tech</h3>
+<p class="text-text-muted">1200 pulses per minute for deep cleaning between teeth where brushing misses.</p>
+</div>
+<!-- Feature 2 -->
+<div class="group relative overflow-hidden rounded-xl border border-border-dark bg-card-dark p-8 transition-all hover:border-primary/50 hover:shadow-lg">
+<div class="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-3xl">volume_off</span>
+</div>
+<h3 class="mb-2 text-xl font-bold text-white">Whisper Quiet</h3>
+<p class="text-text-muted">Operates at less than 50db. Keep your morning routine silent and peaceful.</p>
+</div>
+<!-- Feature 3 -->
+<div class="group relative overflow-hidden rounded-xl border border-border-dark bg-card-dark p-8 transition-all hover:border-primary/50 hover:shadow-lg">
+<div class="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-3xl">water_drop</span>
+</div>
+<h3 class="mb-2 text-xl font-bold text-white">Waterproof IPX7</h3>
+<p class="text-text-muted">Fully submersible and shower ready design. Built for real life usage.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Featured Products Horizontal Scroll -->
+<section class="py-24 border-t border-border-dark/50 bg-[#0b1019]">
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-10">
+<h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Featured Products</h2>
+</div>
+<div class="w-full overflow-x-auto hide-scrollbar pb-8 px-4 sm:px-6 lg:px-8">
+<div class="flex gap-6 mx-auto max-w-7xl min-w-max">
+<!-- Product Card 1 -->
+<div class="flex w-[320px] flex-col overflow-hidden rounded-xl border border-border-dark bg-card-dark shadow-sm transition-all hover:shadow-md hover:border-primary/30 group">
+<div class="relative aspect-[4/5] w-full bg-gray-800 overflow-hidden">
+<img alt="Premium electric flosser on a dark bathroom counter" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-80" data-alt="JetClean Pro product shot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbXTgEjUH3puijy-qq3Fck5WKe3E6DmjMN_R7maB9bym-PwiVd0pTbGv1fUncWP8OFdSMyhg4Ea1ii2y3Rd4bRPIRFWRfhURGJ8RBV_7-UssBtn0UsDn-8YH_CQ6mxih95cCq4Nxz2-yW0u6AgKEHa3o8OhCREkqEvrP2JAA4WX78faT-VDeGEk5u_aBSUBMn1Z_aPcJ4TohCpJFIHRKi7WLiKpUP-2saEpCzgFPPXjh7X15iuy1vwFOP1FSYvj1BUUYK84z93jRfh"/>
+<div class="absolute top-3 left-3 rounded bg-primary px-2 py-1 text-xs font-bold text-white uppercase tracking-wider">Flagship</div>
+</div>
+<div class="flex flex-1 flex-col p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold text-white">JetClean Pro</h3>
+<span class="text-primary font-bold">$129</span>
+</div>
+<p class="text-sm text-text-muted mb-4 flex-1">The ultimate countertop solution with 10 pressure settings.</p>
+<button class="w-full rounded-lg bg-white/5 py-2 text-sm font-semibold text-white hover:bg-white/10 transition-colors border border-white/10">View Details</button>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="flex w-[320px] flex-col overflow-hidden rounded-xl border border-border-dark bg-card-dark shadow-sm transition-all hover:shadow-md hover:border-primary/30 group">
+<div class="relative aspect-[4/5] w-full bg-gray-800 overflow-hidden">
+<img alt="Compact portable flosser in a travel bag setting" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-80" data-alt="TravelPulse Mini product shot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOYoqSiSYd81Z4MkRc32j7Q55I1T3vF8Q6gsQtwfIdR1WQ2tvQ0l8y6tyyafxflrC327A5mgapcMTWvsvGfo4qvWKgEl19DkwfN784ZvHVdw4Xpd7AuHzhbEzyazdrf1hUEnDSs3Gk6u3AnddTSoA5fpBK5lFV5iTsuyUWp2DAB39OKC-8gaEPxx_6mvxSaIslOiJh8SV25lzYuzovwD_uTUMWxO9fN1uY3Lv_yKFd0vIRtsQUH-GxOZGj-W_34XxaqikvGfkl7kZz"/>
+<div class="absolute top-3 left-3 rounded bg-emerald-500 px-2 py-1 text-xs font-bold text-white uppercase tracking-wider">Best Seller</div>
+</div>
+<div class="flex flex-1 flex-col p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold text-white">TravelPulse Mini</h3>
+<span class="text-primary font-bold">$89</span>
+</div>
+<p class="text-sm text-text-muted mb-4 flex-1">Collapsible design for the jet-setter. Powerful yet compact.</p>
+<button class="w-full rounded-lg bg-white/5 py-2 text-sm font-semibold text-white hover:bg-white/10 transition-colors border border-white/10">View Details</button>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="flex w-[320px] flex-col overflow-hidden rounded-xl border border-border-dark bg-card-dark shadow-sm transition-all hover:shadow-md hover:border-primary/30 group">
+<div class="relative aspect-[4/5] w-full bg-gray-800 overflow-hidden">
+<img alt="Large capacity water flosser suitable for families" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-80" data-alt="FamilyTank XL product shot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkZVdBpV-G68cvZ7KfqRx3pQ8oTvBqOPbNCQnFTnZcEQwwRZpKpToGH0nQEumZVyAI17B3y-pnQ-u-3DfkGoou2u4Q9xYz-bh6S-LUDLuCBYI3nvWFQg09h8vha3N_U608pBr33YwtK2b1BjChj_Wls9pL0VuKKuVbBFpD_9u-aaBhSJmyAstmRHEqZ1cOGS6rFUSSzazEJ9xC0wyEWi_564sA-K7i4DZFyLeTXlt1DhZTcVYMS-JmfC0qt-JkVi2btTPP_B8a348G"/>
+</div>
+<div class="flex flex-1 flex-col p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold text-white">FamilyTank XL</h3>
+<span class="text-primary font-bold">$159</span>
+</div>
+<p class="text-sm text-text-muted mb-4 flex-1">Extra large reservoir and multiple tips for the whole household.</p>
+<button class="w-full rounded-lg bg-white/5 py-2 text-sm font-semibold text-white hover:bg-white/10 transition-colors border border-white/10">View Details</button>
+</div>
+</div>
+<!-- Product Card 4 (Placeholder to show scrolling) -->
+<div class="flex w-[320px] flex-col overflow-hidden rounded-xl border border-border-dark bg-card-dark shadow-sm transition-all hover:shadow-md hover:border-primary/30 group opacity-60">
+<div class="flex items-center justify-center h-full flex-col p-10 text-center">
+<span class="material-symbols-outlined text-4xl text-text-muted mb-4">inventory_2</span>
+<h3 class="text-lg font-bold text-white">View All Accessories</h3>
+<p class="text-sm text-text-muted mt-2">Tips, cases, and more.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Comparison Table Section -->
+<section class="py-24 bg-background-dark relative overflow-hidden">
+<div class="absolute right-0 top-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -z-10"></div>
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+<div class="text-center max-w-3xl mx-auto mb-16">
+<h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-4">Novaatoz vs. The Past</h2>
+<p class="text-text-muted">Why settle for string when you can have a stream? See how we stack up against traditional methods.</p>
+</div>
+<div class="glass-panel rounded-2xl overflow-hidden border border-border-dark">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-border-dark/50">
+<th class="p-6 text-sm font-medium text-text-muted w-1/3">Feature</th>
+<th class="p-6 text-lg font-bold text-primary w-1/3 text-center bg-primary/5">
+<div class="flex flex-col items-center gap-1">
+<span class="material-symbols-outlined">water_drop</span>
+<span>Novaatoz</span>
+</div>
+</th>
+<th class="p-6 text-lg font-bold text-slate-400 w-1/3 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="material-symbols-outlined">sentiment_dissatisfied</span>
+<span>String Floss</span>
+</div>
+</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-dark/50">
+<tr>
+<td class="p-6 text-white font-medium">Plaque Removal Effectiveness</td>
+<td class="p-6 text-center bg-primary/5">
+<span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-sm font-medium text-green-400 ring-1 ring-inset ring-green-500/20">99.9%</span>
+</td>
+<td class="p-6 text-center text-text-muted">~60%</td>
+</tr>
+<tr>
+<td class="p-6 text-white font-medium">Gum Health Improvement</td>
+<td class="p-6 text-center bg-primary/5">
+<span class="material-symbols-outlined text-green-400">check_circle</span>
+<span class="block text-xs text-text-muted mt-1">Clinically Proven</span>
+</td>
+<td class="p-6 text-center text-text-muted">
+<span class="material-symbols-outlined text-slate-600">remove</span>
+<span class="block text-xs text-text-muted mt-1">Often causes bleeding</span>
+</td>
+</tr>
+<tr>
+<td class="p-6 text-white font-medium">Time Required</td>
+<td class="p-6 text-center bg-primary/5 text-white">60 Seconds</td>
+<td class="p-6 text-center text-text-muted">3-5 Minutes</td>
+</tr>
+<tr>
+<td class="p-6 text-white font-medium">Braces &amp; Implant Friendly</td>
+<td class="p-6 text-center bg-primary/5">
+<span class="material-symbols-outlined text-green-400">check_circle</span>
+</td>
+<td class="p-6 text-center text-text-muted">
+<span class="material-symbols-outlined text-red-400">cancel</span>
+</td>
+</tr>
+<tr>
+<td class="p-6 text-white font-medium">Tech Integration</td>
+<td class="p-6 text-center bg-primary/5">
+<span class="material-symbols-outlined text-green-400">check_circle</span>
+<span class="block text-xs text-text-muted mt-1">Smart Pressure Sensor</span>
+</td>
+<td class="p-6 text-center text-text-muted">
+<span class="material-symbols-outlined text-slate-600">remove</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="border-t border-border-dark bg-[#0b1019] pt-16 pb-8">
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+<div>
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary text-3xl">water_drop</span>
+<span class="text-xl font-bold tracking-tight text-white">NOVAATOZ</span>
+</div>
+<p class="text-text-muted max-w-md mb-8">
+                            Redefining the daily ritual. Novaatoz combines cutting-edge hydro-technology with minimalist design to bring dental-grade care into your home.
+                        </p>
+<div class="flex gap-4">
+<a class="text-text-muted hover:text-white transition-colors" href="#">
+<span class="sr-only">Twitter</span>
+<svg class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg>
+</a>
+<a class="text-text-muted hover:text-white transition-colors" href="#">
+<span class="sr-only">Instagram</span>
+<svg class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24"><path clip-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.451 4.635c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" fill-rule="evenodd"></path></svg>
+</a>
+</div>
+</div>
+<div>
+<h3 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Stay in the loop</h3>
+<p class="text-text-muted mb-4">Join our newsletter for exclusive drops and oral health tips.</p>
+<form class="flex gap-2 max-w-md">
+<label class="sr-only" for="email-address">Email address</label>
+<input autocomplete="email" class="min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" id="email-address" name="email" placeholder="Enter your email" required="" type="email"/>
+<button class="flex-none rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" type="submit">Subscribe</button>
+</form>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-border-dark pt-12">
+<div>
+<h3 class="text-sm font-semibold text-white mb-4">Products</h3>
+<ul class="space-y-3" role="list">
+<li><a class="text-sm text-text-muted hover:text-white" href="#">JetClean Pro</a></li>
+<li><a class="text-sm text-text-muted hover:text-white" href="#">TravelPulse Mini</a></li>
+<li><a class="text-sm text-text-muted hover:text-white" href="#">FamilyTank XL</a></li>
+<li><a class="text-sm text-text-muted hover:text-white" href="#">Accessories</a></li>
+</ul>
+</div>
+<div>
+<h3 class="text-sm font-semibold text-white mb-4">Company</h3>
+<ul class="space-y-3" role="list">
+<li><a class="text-sm text-text-muted hover:text-white" href="#">About Us</a></li>
+<li><a class="text-sm text-text-muted hover:text-white" href="#">Careers</a></li>
+<li><a class="text-sm text-text-muted hover:text-white" href="#">Press</a></li>
+</ul>
+</div>
+<div>
+<h3 class="text-sm font-semibold text-white mb-4">Support</h3>
+<ul class="space-y-3" role="list">
+<li><a class="text-sm text-text-muted hover:text-white" href="#">Help Center</a></li>
+<li><a class="text-sm text-text-muted hover:text-white" href="#">Warranty</a></li>
+<li><a class="text-sm text-text-muted hover:text-white" href="#">Returns</a></li>
+</ul>
+</div>
+<div>
+<h3 class="text-sm font-semibold text-white mb-4">Legal</h3>
+<ul class="space-y-3" role="list">
+<li><a class="text-sm text-text-muted hover:text-white" href="#">Privacy</a></li>
+<li><a class="text-sm text-text-muted hover:text-white" href="#">Terms</a></li>
+</ul>
+</div>
+</div>
+<div class="border-t border-border-dark mt-12 pt-8 text-center md:text-left">
+<p class="text-xs text-text-muted">© 2023 Novaatoz Inc. All rights reserved.</p>
+</div>
+</div>
+</footer>
+</div>
+</body></html>
+
+<!-- Product Detail: JetClean Pro -->
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Novaatoz JetClean Pro - Product Detail</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#256af4",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                        "surface-dark": "#1a2333",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "sans": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem", 
+                        "lg": "0.5rem", 
+                        "xl": "0.75rem", 
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        "glow": "0 0 20px -5px rgba(37, 106, 244, 0.5)",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #101622;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #222f49;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #256af4;
+        }
+        
+        /* Hide scrollbar for gallery but keep functionality */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display antialiased selection:bg-primary selection:text-white">
+<!-- Navbar -->
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-[#222f49] bg-background-light/80 dark:bg-[#101623]/80 backdrop-blur-md px-6 lg:px-10 py-3">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-slate-900 dark:text-white">
+<div class="size-8 text-primary">
+<svg class="w-full h-full" fill="currentColor" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-xl font-bold leading-tight tracking-[-0.015em]">Novaatoz</h2>
+</div>
+<div class="hidden md:flex items-center gap-9">
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Shop</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Technology</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Support</a>
+</div>
+</div>
+<div class="flex flex-1 justify-end gap-4 lg:gap-8">
+<div class="hidden lg:block w-full max-w-xs">
+<div class="relative w-full">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="bg-slate-100 dark:bg-[#222f49] border-none text-slate-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full pl-10 p-2.5 placeholder-slate-400" placeholder="Search products..." required="" type="text"/>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg size-10 bg-slate-100 dark:bg-[#222f49] text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+</button>
+<button class="flex items-center justify-center rounded-lg size-10 bg-slate-100 dark:bg-[#222f49] text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-[20px]">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="max-w-[1440px] mx-auto px-4 lg:px-10 pb-24">
+<!-- Breadcrumbs -->
+<div class="flex flex-wrap gap-2 py-6 text-sm">
+<a class="text-slate-500 dark:text-[#90a4cb] font-medium hover:text-primary transition-colors" href="#">Home</a>
+<span class="text-slate-400 dark:text-[#556987]">/</span>
+<a class="text-slate-500 dark:text-[#90a4cb] font-medium hover:text-primary transition-colors" href="#">Oral Care</a>
+<span class="text-slate-400 dark:text-[#556987]">/</span>
+<span class="text-slate-900 dark:text-white font-medium">JetClean Pro</span>
+</div>
+<div class="flex flex-col lg:flex-row gap-8 lg:gap-16">
+<!-- Left: Product Gallery -->
+<div class="w-full lg:w-3/5 space-y-4">
+<div class="w-full aspect-[4/3] bg-surface-dark rounded-2xl overflow-hidden relative group">
+<!-- Badge -->
+<div class="absolute top-4 left-4 z-10 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg shadow-primary/25">
+                        Best Seller
+                    </div>
+<img alt="JetClean Pro main product shot showing sleek electric blue device on dark background" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-Lmea2iGJTR0VbBOG5z17SU-97EqNSdGB1_e2CWVzuJl6P1WyfVmMStIMzZuC9KMAhR72JfaRFFuq7j0OSn8TZ22xS2rdM2qxFx54XsHJ-hhG64udrUU1h72aKAylz_UFlSvXXYEG0ffCOjwutn1GetvytZS0OaiIwTdhD-HKVAtEPgdEbBsf3EBLXlivQ_V0vsvOLtn0YeVyOlV35jqh4F_cVX_41BYPEeLWy3gec8TaQqVN_narPKwXjYFNMTLDQGgmAxOM3wJg"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="aspect-square bg-surface-dark rounded-xl overflow-hidden group">
+<img alt="Detail shot of the nozzle tip showing high precision water jet" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7e17qBhCzpa6tgZk4lGDzH-ZkK06Qvv32g2hWB6gDMgUEufXfFp3k3aQYLftKKmjhOp1SDet39U3HVRsSSXo99iCRL5rHFifUTdxM03dryoTzIasa2tX4vxLemeOCNKY3kH-kSed4S75kdsNPvQTwO08W1XNovMy0XT00YGse8SMs6tik-cy98zchj7GkpVRtY-EKVKb-85ixR_1kvQUp7Sj_X5wJLbu2kBsU2w-Gy0XGIDwAXtcqyRdXwyVo39Rip_TZK8Bj_onK"/>
+</div>
+<div class="aspect-square bg-surface-dark rounded-xl overflow-hidden group">
+<img alt="Lifestyle shot of JetClean Pro being held in a modern bathroom" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsFs_a_xDqQu54LmtpBGAjFSNc0kTkjQzsl8PgSy8TWGjiVMqNxeYwSITkHGjSf2zfi_1MnQaW8_6tY9J8ubfMLo_NgIbJ9dhdjURcNsLqt_52IBQ4GScMhjETtt7EJTvCrj_s_l9foySbYV_xhJwrPwgxIMKwYPs4MyhfQgYLFHjFhNjm1notxrStX06zE0fKNEm7nkE88GtTcxuIHkQ6xL3EpxyNO0mQDdxLSj44MHGKkRB6G5nbnexV4eYkv0kf9-p3zyYdQ5By"/>
+</div>
+</div>
+<div class="w-full aspect-video bg-surface-dark rounded-xl overflow-hidden group relative">
+<div class="absolute inset-0 flex items-center justify-center z-10 bg-black/30 group-hover:bg-black/20 transition-colors cursor-pointer">
+<div class="size-16 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20 text-white">
+<span class="material-symbols-outlined text-4xl ml-1">play_arrow</span>
+</div>
+</div>
+<img alt="Video thumbnail showing water flossing action in slow motion" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTXHYyDTg9hsS_L41yM7xvGxFIuOcl81Foiig-Pp15SIqFFwjbUAPOqdsVVieKNAe4Ut0wattHg8LvZKTYugsiUbRzTEktaOpc6A6yK6shsizI1H2tGkQxpf9Tqlk_4Pp5laTaUt9aG2TJmD98xhVbAXjvpVpv0Qaup9Er04E_Xd60ZE-MuN0qFNMKbS5vSorkBVzWg8wwJtVMCcqjFAvUV7a-Or0jC4WAcDI9mWhpBu0VE3WZ_yxvbfq0QfhfaRynV6nOWXWsWOk7"/>
+</div>
+</div>
+<!-- Right: Product Info Sticky -->
+<div class="w-full lg:w-2/5 relative">
+<div class="lg:sticky lg:top-24 space-y-8">
+<!-- Header -->
+<div class="space-y-4 border-b border-slate-200 dark:border-slate-800 pb-6">
+<div class="flex justify-between items-start">
+<div>
+<h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">Novaatoz JetClean Pro</h1>
+<div class="flex items-center gap-2 mt-2">
+<div class="flex text-amber-400 text-sm">
+<span class="material-symbols-outlined text-[18px] filled">star</span>
+<span class="material-symbols-outlined text-[18px] filled">star</span>
+<span class="material-symbols-outlined text-[18px] filled">star</span>
+<span class="material-symbols-outlined text-[18px] filled">star</span>
+<span class="material-symbols-outlined text-[18px] filled">star_half</span>
+</div>
+<span class="text-sm text-slate-500 dark:text-slate-400 font-medium">4.9 (1,248 reviews)</span>
+</div>
+</div>
+</div>
+<div class="flex items-end gap-3">
+<p class="text-3xl font-bold text-slate-900 dark:text-white">$129.00</p>
+<p class="text-lg text-slate-400 dark:text-slate-500 line-through mb-1">$159.00</p>
+<span class="mb-1.5 ml-auto text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded">In Stock</span>
+</div>
+<p class="text-slate-600 dark:text-slate-300 leading-relaxed">
+                            Experience the future of oral hygiene. The JetClean Pro utilizes advanced pulse technology to remove 99.9% of plaque, delivering a dentist-clean feeling every single day.
+                        </p>
+</div>
+<!-- Configurator -->
+<div class="space-y-6">
+<!-- Color Selection -->
+<div class="space-y-3">
+<span class="text-sm font-semibold text-slate-900 dark:text-slate-200 uppercase tracking-wide">Color: <span class="text-primary">Electric Blue</span></span>
+<div class="flex gap-3">
+<button aria-label="Select Electric Blue" class="size-10 rounded-full bg-[#256af4] ring-2 ring-offset-2 ring-offset-background-light dark:ring-offset-background-dark ring-primary shadow-lg shadow-primary/20"></button>
+<button aria-label="Select Onyx" class="size-10 rounded-full bg-[#1a1a1a] hover:ring-2 ring-offset-2 ring-offset-background-light dark:ring-offset-background-dark ring-slate-500 transition-all"></button>
+<button aria-label="Select Arctic White" class="size-10 rounded-full bg-[#f0f0f0] border border-slate-300 hover:ring-2 ring-offset-2 ring-offset-background-light dark:ring-offset-background-dark ring-slate-400 transition-all"></button>
+</div>
+</div>
+<!-- Variant Selection -->
+<div class="space-y-3">
+<span class="text-sm font-semibold text-slate-900 dark:text-slate-200 uppercase tracking-wide">Bundle</span>
+<div class="grid grid-cols-2 gap-3">
+<label class="cursor-pointer relative">
+<input class="peer sr-only" name="bundle" type="radio"/>
+<div class="p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark hover:border-slate-300 dark:hover:border-slate-600 peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
+<div class="font-bold text-slate-900 dark:text-white">Standard</div>
+<div class="text-xs text-slate-500 mt-1">Device Only</div>
+</div>
+</label>
+<label class="cursor-pointer relative">
+<input checked="" class="peer sr-only" name="bundle" type="radio"/>
+<div class="p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark hover:border-slate-300 dark:hover:border-slate-600 peer-checked:border-primary peer-checked:bg-primary/5 transition-all relative overflow-hidden">
+<div class="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-bl">RECOMMENDED</div>
+<div class="font-bold text-slate-900 dark:text-white">Pro Bundle</div>
+<div class="text-xs text-slate-500 mt-1">+ Case &amp; Tips</div>
+</div>
+</label>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="space-y-4 pt-4">
+<button class="w-full bg-primary hover:bg-blue-600 text-white font-bold text-lg py-4 px-8 rounded-xl shadow-glow transition-all active:scale-[0.98] flex items-center justify-center gap-2 group">
+<span>Add to Cart</span>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<div class="flex items-center justify-center gap-6 text-xs font-medium text-slate-500 dark:text-slate-400">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-green-500">local_shipping</span>
+                                Free 2-Day Shipping
+                            </div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-primary">verified_user</span>
+                                2-Year Warranty
+                            </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Below Fold Content -->
+<div class="mt-24 space-y-24">
+<!-- Features Grid -->
+<section>
+<h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-8">Technical Specifications</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="bg-white dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col gap-4 group hover:border-primary/50 transition-colors">
+<div class="size-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">water_drop</span>
+</div>
+<div>
+<p class="text-sm text-slate-500 uppercase font-bold tracking-wider mb-1">Pressure</p>
+<p class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">120 PSI Max</p>
+<p class="text-sm text-slate-500 mt-2">Variable intensity for sensitive gums.</p>
+</div>
+</div>
+<div class="bg-white dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col gap-4 group hover:border-primary/50 transition-colors">
+<div class="size-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">battery_charging_full</span>
+</div>
+<div>
+<p class="text-sm text-slate-500 uppercase font-bold tracking-wider mb-1">Battery Life</p>
+<p class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">45 Days</p>
+<p class="text-sm text-slate-500 mt-2">Based on 2x daily usage. USB-C Fast Charge.</p>
+</div>
+</div>
+<div class="bg-white dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col gap-4 group hover:border-primary/50 transition-colors">
+<div class="size-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">waves</span>
+</div>
+<div>
+<p class="text-sm text-slate-500 uppercase font-bold tracking-wider mb-1">Pulse Tech</p>
+<p class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">1800 Pulses/min</p>
+<p class="text-sm text-slate-500 mt-2">Deep cleans between teeth efficiently.</p>
+</div>
+</div>
+<div class="bg-white dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col gap-4 group hover:border-primary/50 transition-colors">
+<div class="size-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">shield</span>
+</div>
+<div>
+<p class="text-sm text-slate-500 uppercase font-bold tracking-wider mb-1">Protection</p>
+<p class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">IPX7 Waterproof</p>
+<p class="text-sm text-slate-500 mt-2">Safe to use in the shower. Easy to clean.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- What's in the box -->
+<section class="flex flex-col md:flex-row gap-12 items-center">
+<div class="w-full md:w-1/2">
+<h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">What's in the Box</h3>
+<ul class="space-y-4">
+<li class="flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-800">
+<span class="material-symbols-outlined text-primary">dentistry</span>
+<span class="font-medium text-slate-700 dark:text-slate-200">1x JetClean Pro Handle</span>
+</li>
+<li class="flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-800">
+<span class="material-symbols-outlined text-primary">cleaning_services</span>
+<span class="font-medium text-slate-700 dark:text-slate-200">4x Specialized Nozzles</span>
+</li>
+<li class="flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-800">
+<span class="material-symbols-outlined text-primary">cable</span>
+<span class="font-medium text-slate-700 dark:text-slate-200">1x USB-C Charging Cable</span>
+</li>
+<li class="flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-800">
+<span class="material-symbols-outlined text-primary">luggage</span>
+<span class="font-medium text-slate-700 dark:text-slate-200">1x Premium Travel Case</span>
+</li>
+</ul>
+</div>
+<div class="w-full md:w-1/2 relative">
+<div class="aspect-square bg-gradient-to-tr from-surface-dark to-[#222f49] rounded-full absolute -top-10 -right-10 w-4/5 opacity-50 blur-3xl z-0"></div>
+<div class="relative z-10 aspect-square bg-surface-dark rounded-2xl overflow-hidden border border-slate-800">
+<img alt="Flat lay of water flosser accessories including nozzles and charging cable on dark surface" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzKmXKko-8kDWCs5gUByLLVeYfzwNLLwbD_pocA5kwUp43vNac3yTFQSL0JtziDpr8NRwdmLuXTSofSV3pE_OGXaqyJWYxelfjs086jFulzO2Z2YLVczMiP7NrzXSLeIoigAVeTHxjaDahrzhqgn6yYdDXa-pU_Rg0DowJb5ZE-QaQTHusxU7l5q5zSQdwbv4D9FtzTfbsU-GsXehZd74fqe25EeWjJvA3GY_i4DohZqL--TfHS6rV7DVG3JoXPbx9ldRp56UvRHk2"/>
+</div>
+</div>
+</section>
+<!-- FAQ -->
+<section class="max-w-3xl mx-auto w-full">
+<h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-8 text-center">Frequently Asked Questions</h3>
+<div class="space-y-4">
+<details class="group bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 open:border-primary/50 transition-colors">
+<summary class="flex cursor-pointer list-none items-center justify-between p-6 text-lg font-medium text-slate-900 dark:text-white">
+                            How often should I change the nozzle?
+                            <span class="transition group-open:rotate-180">
+<span class="material-symbols-outlined">expand_more</span>
+</span>
+</summary>
+<div class="px-6 pb-6 text-slate-600 dark:text-slate-300">
+                            We recommend replacing the nozzle every 3 months for optimal hygiene and performance. The JetClean Pro comes with 4 nozzles, providing a year's supply out of the box.
+                        </div>
+</details>
+<details class="group bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 open:border-primary/50 transition-colors">
+<summary class="flex cursor-pointer list-none items-center justify-between p-6 text-lg font-medium text-slate-900 dark:text-white">
+                            Is it safe for sensitive gums?
+                            <span class="transition group-open:rotate-180">
+<span class="material-symbols-outlined">expand_more</span>
+</span>
+</summary>
+<div class="px-6 pb-6 text-slate-600 dark:text-slate-300">
+                            Absolutely. The device features a 'Soft' mode specifically designed for sensitive gums or first-time users. You can gradually increase intensity as your gums become healthier.
+                        </div>
+</details>
+<details class="group bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 open:border-primary/50 transition-colors">
+<summary class="flex cursor-pointer list-none items-center justify-between p-6 text-lg font-medium text-slate-900 dark:text-white">
+                            Can I use mouthwash in the reservoir?
+                            <span class="transition group-open:rotate-180">
+<span class="material-symbols-outlined">expand_more</span>
+</span>
+</summary>
+<div class="px-6 pb-6 text-slate-600 dark:text-slate-300">
+                            Yes, you can add a small amount of mouthwash mixed with water to the reservoir for an extra fresh feeling. We recommend a 1:1 ratio of mouthwash to water.
+                        </div>
+</details>
+</div>
+</section>
+</div>
+</main>
+<!-- Sticky Bottom Bar (Visible on scroll via JS ideally, simplified here to be fixed at bottom for demo purposes) -->
+<!-- In a real implementation, you would use IntersectionObserver to toggle visibility -->
+<div class="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-[#101623]/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 py-4 px-6 lg:px-10 hidden md:flex items-center justify-between shadow-2xl transform translate-y-0 transition-transform">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded bg-surface-dark overflow-hidden">
+<img alt="Small thumbnail of JetClean Pro" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAzgwYljzo0I6cUoi-MuuWZSCOW3AdVx0VP40CQe5EZyfDWlZmodU2Ino_UutZP_ooEj3-z-rhaj2Q4GFwkiYHjjOYsTiQSshvKqp8LHvg1IXIXgpKSVzOVRTyloguh5XZ_NV47IUUTWdSRE-_3Sph_mY2DkulbUIXlub8P4fq2xIuWAGu7YLt-I-bpNhvf0spclNSmaIMxbiTqCSW6e_HJIMB_rsRC5OcMLBmJoGPqVmSuPn9YcyWKgH4ruKFaS5xze22DGVAnTlf"/>
+</div>
+<div>
+<p class="font-bold text-slate-900 dark:text-white">Novaatoz JetClean Pro</p>
+<p class="text-sm text-slate-500">Electric Blue / Pro Bundle</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<p class="text-xl font-bold text-slate-900 dark:text-white">$129.00</p>
+<button class="bg-primary hover:bg-blue-600 text-white font-bold py-2.5 px-6 rounded-lg shadow-glow transition-all active:scale-95 text-sm uppercase tracking-wide">
+                Add to Cart
+            </button>
+</div>
+</div>
+</body></html>
+
+<!-- Novaatoz Admin: Sales Dashboard -->
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Novaatoz Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#256af4",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#0f1115", 
+                        "surface-dark": "#1a1d24",
+                        "card-dark": "#22262e",
+                    },
+                    fontFamily: {
+                        "sans": ["Inter", "sans-serif"],
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for cyber aesthetic */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1d24; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #314368; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b6291; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white overflow-hidden">
+<div class="flex h-screen w-full bg-background-light dark:bg-background-dark overflow-hidden">
+<!-- Side Navigation -->
+<aside class="flex w-64 flex-col bg-[#101623] border-r border-[#222f49] flex-shrink-0 z-20 transition-all duration-300">
+<div class="flex h-full flex-col justify-between p-4">
+<div class="flex flex-col gap-4">
+<!-- Branding -->
+<div class="flex items-center gap-3 px-2 py-2">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 ring-2 ring-primary/20 shadow-[0_0_15px_rgba(37,106,244,0.3)]" data-alt="Abstract blue liquid wave pattern" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCeQnJq6Gntb9wolBvUhPgqApW3_okZA-mkHDww5lYivaixzuSAnYDUwVH8SbhfllLD90z_fmwJpMDPpGuCwpmtTNOtZ1PISHcs9jWIscxr2bnVO2_A1dzM5eF4KxK3Xxpzfn1msn51Luj_czIwjs7fuZqhoweBaTDAonTwfEkew4BGZL4WGwcTQGcjoo6xJNaxyanxvdKj9gxrxkjHBO7Q4uBDAIxvyZgVji0i6838g7giWQCXBuJePHUgc9g3gliBWN3mDRRCuZe8");'></div>
+<div class="flex flex-col">
+<h1 class="text-white text-base font-bold tracking-tight">Novaatoz</h1>
+<p class="text-[#90a4cb] text-xs font-medium tracking-wide">ADMIN CONSOLE</p>
+</div>
+</div>
+<!-- Nav Menu -->
+<nav class="flex flex-col gap-1 mt-4">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary text-white shadow-[0_0_15px_rgba(37,106,244,0.4)] transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#90a4cb] hover:bg-[#222f49] hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-white transition-colors">inventory_2</span>
+<span class="text-sm font-medium">Products</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#90a4cb] hover:bg-[#222f49] hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-white transition-colors">shopping_cart</span>
+<span class="text-sm font-medium">Orders</span>
+<span class="ml-auto bg-primary/20 text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-md">12</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#90a4cb] hover:bg-[#222f49] hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-white transition-colors">group</span>
+<span class="text-sm font-medium">Customers</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#90a4cb] hover:bg-[#222f49] hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-white transition-colors">percent</span>
+<span class="text-sm font-medium">Discounts</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#90a4cb] hover:bg-[#222f49] hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-white transition-colors">article</span>
+<span class="text-sm font-medium">Content</span>
+</a>
+</nav>
+</div>
+<!-- Bottom Nav -->
+<div class="flex flex-col gap-2 border-t border-[#222f49] pt-4">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#90a4cb] hover:bg-[#222f49] hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-white transition-colors">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+<div class="mt-2 flex items-center gap-3 px-3 py-3 rounded-xl bg-[#1a202e] border border-[#222f49]">
+<div class="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white shadow-inner">JD</div>
+<div class="flex flex-col overflow-hidden">
+<span class="text-white text-xs font-semibold truncate">Jane Doe</span>
+<span class="text-[#90a4cb] text-[10px] truncate">Admin</span>
+</div>
+<button class="ml-auto text-[#90a4cb] hover:text-white">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+</button>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#0b0e14]">
+<!-- Header -->
+<header class="flex items-center justify-between border-b border-[#222f49] bg-[#101623]/95 backdrop-blur-md px-6 py-4 sticky top-0 z-10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">analytics</span>
+<h2 class="text-white text-lg font-semibold tracking-tight">Dashboard Overview</h2>
+</div>
+<div class="flex items-center gap-4">
+<!-- Search -->
+<div class="relative hidden md:block group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-[#90a4cb] text-[20px]">search</span>
+</div>
+<input class="block w-64 pl-10 pr-3 py-2 border border-[#222f49] rounded-lg leading-5 bg-[#1a1d24] text-white placeholder-[#90a4cb] focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition-all duration-200" placeholder="Search orders, products..." type="text"/>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-2">
+<button class="relative p-2 rounded-lg hover:bg-[#222f49] text-[#90a4cb] hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 border border-[#101623]"></span>
+</button>
+<button class="p-2 rounded-lg hover:bg-[#222f49] text-[#90a4cb] hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">help</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 scroll-smooth">
+<!-- KPI Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Revenue -->
+<div class="bg-[#151b26] border border-[#222f49] rounded-xl p-5 hover:border-primary/50 transition-colors group relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-primary">payments</span>
+</div>
+<div class="flex flex-col gap-1 relative z-10">
+<p class="text-[#90a4cb] text-sm font-medium">Total Revenue</p>
+<h3 class="text-white text-2xl font-bold tracking-tight">$124,592</h3>
+<div class="flex items-center gap-1.5 mt-2">
+<span class="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+                                12%
+                            </span>
+<span class="text-[#586a8a] text-xs">vs last month</span>
+</div>
+</div>
+</div>
+<!-- Orders -->
+<div class="bg-[#151b26] border border-[#222f49] rounded-xl p-5 hover:border-primary/50 transition-colors group relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-white">shopping_bag</span>
+</div>
+<div class="flex flex-col gap-1 relative z-10">
+<p class="text-[#90a4cb] text-sm font-medium">Orders</p>
+<h3 class="text-white text-2xl font-bold tracking-tight">1,402</h3>
+<div class="flex items-center gap-1.5 mt-2">
+<span class="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+                                5%
+                            </span>
+<span class="text-[#586a8a] text-xs">vs last month</span>
+</div>
+</div>
+</div>
+<!-- AOV -->
+<div class="bg-[#151b26] border border-[#222f49] rounded-xl p-5 hover:border-primary/50 transition-colors group relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-white">price_check</span>
+</div>
+<div class="flex flex-col gap-1 relative z-10">
+<p class="text-[#90a4cb] text-sm font-medium">Avg. Order Value</p>
+<h3 class="text-white text-2xl font-bold tracking-tight">$89.00</h3>
+<div class="flex items-center gap-1.5 mt-2">
+<span class="bg-rose-500/10 text-rose-400 text-xs font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_down</span>
+                                2%
+                            </span>
+<span class="text-[#586a8a] text-xs">vs last month</span>
+</div>
+</div>
+</div>
+<!-- Conversion -->
+<div class="bg-[#151b26] border border-[#222f49] rounded-xl p-5 hover:border-primary/50 transition-colors group relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-white">ads_click</span>
+</div>
+<div class="flex flex-col gap-1 relative z-10">
+<p class="text-[#90a4cb] text-sm font-medium">Conversion Rate</p>
+<h3 class="text-white text-2xl font-bold tracking-tight">3.2%</h3>
+<div class="flex items-center gap-1.5 mt-2">
+<span class="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+                                0.4%
+                            </span>
+<span class="text-[#586a8a] text-xs">vs last month</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Charts & Alerts Row -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Main Chart -->
+<div class="lg:col-span-2 bg-[#151b26] border border-[#222f49] rounded-xl p-6 flex flex-col shadow-lg">
+<div class="flex items-center justify-between mb-6">
+<div>
+<h3 class="text-white text-base font-semibold">Sales Performance</h3>
+<p class="text-[#586a8a] text-xs mt-1">Daily revenue over the last 30 days</p>
+</div>
+<button class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#222f49] bg-[#1a1d24] text-[#90a4cb] text-xs hover:text-white hover:border-primary/50 transition-all">
+<span>Last 30 Days</span>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+</div>
+<div class="flex-1 relative min-h-[250px] w-full">
+<!-- Simulated Chart Graphic using SVG -->
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 800 250">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#256af4" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#256af4" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Grid Lines -->
+<line stroke="#222f49" stroke-dasharray="4" stroke-width="1" x1="0" x2="800" y1="50" y2="50"></line>
+<line stroke="#222f49" stroke-dasharray="4" stroke-width="1" x1="0" x2="800" y1="100" y2="100"></line>
+<line stroke="#222f49" stroke-dasharray="4" stroke-width="1" x1="0" x2="800" y1="150" y2="150"></line>
+<line stroke="#222f49" stroke-dasharray="4" stroke-width="1" x1="0" x2="800" y1="200" y2="200"></line>
+<!-- Area Path -->
+<path d="M0,200 C50,180 100,210 150,160 C200,110 250,140 300,120 C350,100 400,110 450,80 C500,50 550,90 600,60 C650,30 700,70 750,40 L800,20 L800,250 L0,250 Z" fill="url(#chartGradient)"></path>
+<!-- Line Path -->
+<path d="M0,200 C50,180 100,210 150,160 C200,110 250,140 300,120 C350,100 400,110 450,80 C500,50 550,90 600,60 C650,30 700,70 750,40 L800,20" fill="none" stroke="#256af4" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+</svg>
+</div>
+<div class="flex justify-between mt-4 px-2 text-[#586a8a] text-xs font-mono">
+<span>Nov 01</span>
+<span>Nov 05</span>
+<span>Nov 10</span>
+<span>Nov 15</span>
+<span>Nov 20</span>
+<span>Nov 25</span>
+<span>Nov 30</span>
+</div>
+</div>
+<!-- Alert & Secondary Widget -->
+<div class="flex flex-col gap-6">
+<!-- Low Stock Alert -->
+<div class="bg-[#151b26] border border-[#222f49] rounded-xl p-5 shadow-lg relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-amber-500"></div>
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-2 text-amber-500 mb-1">
+<span class="material-symbols-outlined">warning</span>
+<span class="text-sm font-bold uppercase tracking-wider">Low Stock Alert</span>
+</div>
+<button class="text-xs bg-[#222f49] hover:bg-[#314368] text-white px-3 py-1 rounded transition-colors">
+                                Restock
+                            </button>
+</div>
+<h4 class="text-white text-sm font-semibold">Replacement Tip Pack</h4>
+<p class="text-[#90a4cb] text-xs mt-1 mb-3">Only 12 units remaining in inventory. Reorder threshold reached.</p>
+<div class="w-full bg-[#222f49] rounded-full h-1.5">
+<div class="bg-amber-500 h-1.5 rounded-full" style="width: 15%"></div>
+</div>
+</div>
+<!-- Mini Report -->
+<div class="flex-1 bg-[#151b26] border border-[#222f49] rounded-xl p-5 shadow-lg flex flex-col justify-center items-center text-center">
+<div class="size-16 rounded-full bg-[#1a202e] flex items-center justify-center mb-3 ring-1 ring-[#222f49]">
+<span class="material-symbols-outlined text-primary text-3xl">download</span>
+</div>
+<h4 class="text-white text-sm font-semibold">Monthly Report</h4>
+<p class="text-[#90a4cb] text-xs mt-1 mb-4 max-w-[200px]">Download the complete sales analysis for November.</p>
+<button class="w-full py-2 bg-[#222f49] hover:bg-primary/90 hover:text-white text-[#90a4cb] text-xs font-medium rounded-lg transition-all border border-transparent hover:border-primary/50">
+                            Download PDF
+                        </button>
+</div>
+</div>
+</div>
+<!-- Recent Orders Table -->
+<div class="bg-[#151b26] border border-[#222f49] rounded-xl overflow-hidden shadow-lg">
+<div class="flex items-center justify-between px-6 py-4 border-b border-[#222f49]">
+<h3 class="text-white text-base font-semibold">Recent Orders</h3>
+<a class="text-primary text-xs font-medium hover:underline flex items-center gap-1" href="#">
+                        View All
+                        <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#1a202e] text-[#90a4cb] text-xs uppercase tracking-wider font-medium border-b border-[#222f49]">
+<th class="px-6 py-3 font-medium">Order ID</th>
+<th class="px-6 py-3 font-medium">Customer</th>
+<th class="px-6 py-3 font-medium">Product</th>
+<th class="px-6 py-3 font-medium">Date</th>
+<th class="px-6 py-3 font-medium">Amount</th>
+<th class="px-6 py-3 font-medium">Status</th>
+<th class="px-6 py-3 font-medium text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#222f49] text-sm">
+<tr class="group hover:bg-[#1a202e]/50 transition-colors">
+<td class="px-6 py-4 text-white font-medium font-mono">#NZ-8821</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-slate-700 flex items-center justify-center text-xs text-white bg-cover bg-center" data-alt="Portrait of Alex D" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuARd4wyyOuMJQ5s5tSeTFUWL1UFbNa-CD8Z45cmH4R1yXaFRhNIbsaD_7F_sCR1e-W-y_SC742twfg51wHv0T7dAwRCvAJjTdrIyzDO4GQz-XxpBxJqPyoINZK7qAbaFYlWS-jNUIJgVz1pLHwxpxFd9S0NHPCzTlNKelj-eExEdBVcyV9Aak5XKDKyykpCQflhYDrkasAXCv0ryKqvPKkTH_Ylzd1m891XFyUfQ6nScZV67uLEzbkd7KDeGUJ8iMNR_hEyikLNTZ1l')"></div>
+<div class="text-white">Alex D.</div>
+</div>
+</td>
+<td class="px-6 py-4 text-[#90a4cb]">Novaatoz Pro Flosser</td>
+<td class="px-6 py-4 text-[#90a4cb]">Nov 24, 2023</td>
+<td class="px-6 py-4 text-white font-medium">$89.00</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        Paid
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-[#90a4cb] hover:text-white p-1 rounded hover:bg-[#222f49] transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-[#1a202e]/50 transition-colors">
+<td class="px-6 py-4 text-white font-medium font-mono">#NZ-8820</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-slate-700 flex items-center justify-center text-xs text-white bg-cover bg-center" data-alt="Portrait of Sarah M" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBWvZ6pqpIMx4XsPAnT-aYBEJ3_5QR3G8-0Hxl3MuBn1SxmOUYZh76kUcstCRdL9iC_1ft2aQlpvK1aO8aijCBE0uYKWLFEOayjs7bBbnllucL_xKUdtHClnePLiiJw0pF4rsgJ5vjqh-1t-qto2fgEd6Lx-7I9xU4ERm0HVYobjips4Vo24F7_ndz2gDMoA-kTdLeNXFvwnPfDMRWgFDQjyydhLZZDGFTmPd-S499kBq3w484DEkmdlHFPSqBnDdRJ0kh__LEeKDHA')"></div>
+<div class="text-white">Sarah M.</div>
+</div>
+</td>
+<td class="px-6 py-4 text-[#90a4cb]">Replacement Tip Pack (4)</td>
+<td class="px-6 py-4 text-[#90a4cb]">Nov 24, 2023</td>
+<td class="px-6 py-4 text-white font-medium">$24.99</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                        Processing
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-[#90a4cb] hover:text-white p-1 rounded hover:bg-[#222f49] transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-[#1a202e]/50 transition-colors">
+<td class="px-6 py-4 text-white font-medium font-mono">#NZ-8819</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-indigo-900 flex items-center justify-center text-xs text-indigo-300 font-bold border border-indigo-700/50">MJ</div>
+<div class="text-white">Michael J.</div>
+</div>
+</td>
+<td class="px-6 py-4 text-[#90a4cb]">Novaatoz Pro Flosser</td>
+<td class="px-6 py-4 text-[#90a4cb]">Nov 23, 2023</td>
+<td class="px-6 py-4 text-white font-medium">$89.00</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+<span class="material-symbols-outlined text-[14px]">local_shipping</span>
+                                        Shipped
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-[#90a4cb] hover:text-white p-1 rounded hover:bg-[#222f49] transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-[#1a202e]/50 transition-colors">
+<td class="px-6 py-4 text-white font-medium font-mono">#NZ-8818</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-slate-700 flex items-center justify-center text-xs text-white bg-cover bg-center" data-alt="Portrait of David K" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA9_g0qgUdJX3lNmS8fY-Y6l3oT4PXhxmeoP4qFZ0Q6WbFicw5WwkHtrze9s7-gnzjykdJRw1kId-K63K0ncbTrdj7OLOx3TL3hYGbVPR43rl1uA1mOTjB_OkeXPXP8xlTNZrDExec25RDYf90vzFG48uLQUSDNMq3FMOakAM5WMAq9W80AxWa93TFoysH_quzmz_wFuRuB16NrHDLXBZ_Cjb1xKPwu5-eQFrt1R33T10YByYhJyuWBRhX5krLUDrn3UOC7xHmprSjP')"></div>
+<div class="text-white">David K.</div>
+</div>
+</td>
+<td class="px-6 py-4 text-[#90a4cb]">Travel Case - Black</td>
+<td class="px-6 py-4 text-[#90a4cb]">Nov 23, 2023</td>
+<td class="px-6 py-4 text-white font-medium">$19.50</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        Paid
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-[#90a4cb] hover:text-white p-1 rounded hover:bg-[#222f49] transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<footer class="mt-8 border-t border-[#222f49] pt-6 pb-2">
+<div class="flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-[#586a8a] text-xs">© 2023 Novaatoz Inc. All rights reserved.</p>
+<div class="flex gap-4">
+<a class="text-[#586a8a] text-xs hover:text-white" href="#">Privacy Policy</a>
+<a class="text-[#586a8a] text-xs hover:text-white" href="#">Terms of Service</a>
+</div>
+</div>
+</footer>
+</div>
+</main>
+</div>
+</body></html>
