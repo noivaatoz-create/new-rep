@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Droplets, Waves, VolumeX, CheckCircle, XCircle, Minus } from "lucide-react";
@@ -5,7 +6,34 @@ import { useCartStore } from "@/lib/cart-store";
 import { HOME_GALLERY_SETTINGS_KEY, parseHomeGalleryImages } from "@/lib/home-gallery";
 import type { Product, Review } from "@shared/schema";
 
+const HERO_FALLBACK = {
+  name: "JetClean Pro",
+  slug: "jetclean-pro",
+  image: "/images/hero-product.png",
+  badge: "Flagship",
+};
+
 function HeroSection() {
+  const [heroIndex, setHeroIndex] = useState(0);
+  const { data: products } = useQuery<Product[]>({
+    queryKey: ["/api/products"],
+    staleTime: 60_000,
+  });
+  const heroProducts = products?.filter((p) => p.isFeatured).length
+    ? products!.filter((p) => p.isFeatured)
+    : products?.length
+      ? products!.slice(0, 4)
+      : [];
+  const current =
+    heroProducts.length > 0 && heroProducts[heroIndex]
+      ? {
+          name: heroProducts[heroIndex].name,
+          slug: heroProducts[heroIndex].slug,
+          image: heroProducts[heroIndex].image,
+          badge: heroProducts[heroIndex].badge || "Featured",
+        }
+      : HERO_FALLBACK;
+
   return (
     <section className="relative overflow-hidden py-24 sm:py-36 lg:py-44" data-testid="section-hero">
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-primary/8 rounded-full blur-[140px] -z-10" />
@@ -19,6 +47,16 @@ function HeroSection() {
               </span>
               New Release
             </div>
+            <Link href="/shop" className="w-fit">
+              <button
+                type="button"
+                className="relative z-10 flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground h-12 px-8 text-sm font-semibold tracking-wide shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98]"
+                data-testid="button-hero-shop-now"
+              >
+                Shop Now
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </Link>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-normal tracking-tight leading-[1.15] text-foreground">
               The Art of <br />
               <span className="text-primary italic">
@@ -35,7 +73,7 @@ function HeroSection() {
                   <ArrowRight className="h-3.5 w-3.5" />
                 </button>
               </Link>
-              <Link href="/product/jetclean-pro">
+              <Link href={`/product/${current.slug}`}>
                 <button className="flex items-center justify-center rounded-full border border-border h-11 px-7 text-sm font-medium tracking-wide text-foreground transition-all hover:bg-accent/50" data-testid="button-watch-demo">
                   Learn More
                 </button>
@@ -48,24 +86,44 @@ function HeroSection() {
             <div className="relative z-10 w-full max-w-md aspect-[3/4] rounded-3xl bg-gradient-to-b from-accent/50 to-card p-1 shadow-xl">
               <div className="h-full w-full rounded-[22px] bg-card overflow-hidden relative">
                 <img
-                  alt="Novaatoz JetClean Pro Water Flosser"
-                  className="h-full w-full object-cover"
-                  src="/images/hero-product.png"
+                  key={current.slug}
+                  alt={current.name}
+                  className="h-full w-full object-cover transition-opacity duration-300"
+                  src={current.image}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                 <div className="absolute bottom-8 left-8 right-8">
                   <div className="flex justify-between items-end gap-4">
                     <div>
-                      <p className="text-white/70 text-xs font-medium tracking-[0.2em] uppercase">Flagship</p>
-                      <h3 className="text-white text-xl font-serif">JetClean Pro</h3>
+                      <p className="text-white/70 text-xs font-medium tracking-[0.2em] uppercase">{current.badge}</p>
+                      <h3 className="text-white text-xl font-serif">{current.name}</h3>
                     </div>
-                    <Link href="/product/jetclean-pro">
+                    <Link href={`/product/${current.slug}`}>
                       <div className="h-9 w-9 rounded-full bg-white/15 backdrop-blur flex items-center justify-center hover:bg-white/25 transition-colors cursor-pointer" data-testid="button-hero-product-link">
                         <ArrowRight className="h-4 w-4 text-white" />
                       </div>
                     </Link>
                   </div>
                 </div>
+                {/* Toggle: jo ON ho us product hero mein dikhe */}
+                {heroProducts.length > 1 && (
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                    {heroProducts.map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        aria-label={`Show ${heroProducts[i].name}`}
+                        onClick={() => setHeroIndex(i)}
+                        className={`h-2.5 rounded-full transition-all duration-200 ${
+                          i === heroIndex
+                            ? "w-8 bg-white"
+                            : "w-2.5 bg-white/50 hover:bg-white/70"
+                        }`}
+                        data-testid={`hero-toggle-${i}`}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
