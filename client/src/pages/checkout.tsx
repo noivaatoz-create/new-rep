@@ -80,6 +80,13 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (paymentMethod !== "paypal" || !showPaypal || !paypalConfig?.enabled || !paypalConfig.clientId) {
+      if (paymentMethod === "paypal" && (!paypalConfig?.clientId || !paypalConfig?.enabled)) {
+        toast({
+          title: "PayPal not configured",
+          description: "Add PayPal Client ID in Admin → Settings → Payment to enable PayPal checkout.",
+          variant: "destructive",
+        });
+      }
       return;
     }
 
@@ -105,14 +112,32 @@ export default function CheckoutPage() {
             height: 44,
           },
           createOrder: async () => {
-            const amount = grandTotalRef.current.toFixed(2);
-            const currency = currencyRef.current;
-            const response = await apiRequest("POST", "/api/paypal/create-order", {
-              amount,
-              currency,
-            });
-            const data = await response.json();
-            return data.id;
+            try {
+              const amount = grandTotalRef.current.toFixed(2);
+              const currency = currencyRef.current;
+              const response = await apiRequest("POST", "/api/paypal/create-order", {
+                amount,
+                currency,
+              });
+              if (!response.ok) {
+                const err = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
+                throw new Error(err.error || "Failed to create PayPal order");
+              }
+              const data = await response.json();
+              if (!data.id) {
+                throw new Error("PayPal order ID missing");
+              }
+              return data.id;
+            } catch (err) {
+              console.error("[PayPal] createOrder error:", err);
+              const message = err instanceof Error ? err.message : "Failed to create order";
+              toast({
+                title: "PayPal error",
+                description: message,
+                variant: "destructive",
+              });
+              throw err;
+            }
           },
           onApprove: async (data: { orderID: string }) => {
             setPaypalLoading(true);
@@ -137,10 +162,12 @@ export default function CheckoutPage() {
               setPaypalLoading(false);
             }
           },
-          onError: () => {
+          onError: (err: any) => {
+            console.error("[PayPal] SDK error:", err);
+            const message = err?.message || err?.toString() || "Unable to start PayPal checkout";
             toast({
               title: "Payment error",
-              description: "Unable to start PayPal checkout. Please try again.",
+              description: message,
               variant: "destructive",
             });
           },
@@ -166,6 +193,14 @@ export default function CheckoutPage() {
     script.async = true;
     script.dataset.paypalSdk = "true";
     script.onload = renderButtons;
+    script.onerror = () => {
+      console.error("[PayPal] SDK script failed to load");
+      toast({
+        title: "PayPal error",
+        description: "Failed to load PayPal SDK. Check your Client ID in Admin → Settings.",
+        variant: "destructive",
+      });
+    };
     document.body.appendChild(script);
 
     return () => {
