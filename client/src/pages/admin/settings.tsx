@@ -37,6 +37,7 @@ interface SettingsForm {
   showFooterSocial: string;
   showFooterLinks: string;
   copyrightText: string;
+  heroFallbackImage: string;
   socialFacebook: string;
   socialInstagram: string;
   socialTwitter: string;
@@ -76,6 +77,7 @@ const defaultForm: SettingsForm = {
   showFooterSocial: "true",
   showFooterLinks: "true",
   copyrightText: "",
+  heroFallbackImage: "",
   socialFacebook: "",
   socialInstagram: "",
   socialTwitter: "",
@@ -159,6 +161,7 @@ export default function AdminSettings() {
         showFooterSocial: settings.showFooterSocial || "true",
         showFooterLinks: settings.showFooterLinks || "true",
         copyrightText: settings.copyrightText || "",
+        heroFallbackImage: settings.heroFallbackImage || "",
         socialFacebook: settings.socialFacebook || "",
         socialInstagram: settings.socialInstagram || "",
         socialTwitter: settings.socialTwitter || "",
@@ -222,6 +225,7 @@ export default function AdminSettings() {
       showFooterSocial: form.showFooterSocial,
       showFooterLinks: form.showFooterLinks,
       copyrightText: form.copyrightText,
+      heroFallbackImage: form.heroFallbackImage,
       socialFacebook: form.socialFacebook,
       socialInstagram: form.socialInstagram,
       socialTwitter: form.socialTwitter,
@@ -652,6 +656,18 @@ export default function AdminSettings() {
                         placeholder="© 2025 Novaatoz Inc. All rights reserved."
                         data-testid="input-copyright-text"
                       />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Hero fallback image URL</label>
+                      <input
+                        type="url"
+                        value={form.heroFallbackImage}
+                        onChange={(e) => setForm({ ...form, heroFallbackImage: e.target.value })}
+                        className={inputClass}
+                        placeholder="/images/hero-product.png ya full URL"
+                        data-testid="input-hero-fallback-image"
+                      />
+                      <p className="text-muted-foreground text-xs mt-1">Jab hero pe koi product nahi ya fallback dikhe, ye image use hogi.</p>
                     </div>
                   </div>
 

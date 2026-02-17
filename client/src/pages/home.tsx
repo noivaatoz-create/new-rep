@@ -9,7 +9,6 @@ import type { Product, Review } from "@shared/schema";
 const HERO_FALLBACK = {
   name: "JetClean Pro",
   slug: "jetclean-pro",
-  image: "/images/hero-product.png",
   badge: "Flagship",
 };
 
@@ -19,6 +18,7 @@ function HeroSection() {
     queryKey: ["/api/products"],
     staleTime: 60_000,
   });
+  const { data: settings } = useQuery<Record<string, string>>({ queryKey: ["/api/settings"] });
   // Hero: pehle admin ne "Hero" toggle ON kiye products, warna featured + baki (pehle 4)
   const showOnHeroList = products?.filter((p) => (p as { showOnHero?: boolean }).showOnHero) ?? [];
   const featured = products?.filter((p) => p.isFeatured) ?? [];
@@ -33,18 +33,23 @@ function HeroSection() {
     heroProducts.length >= 2
       ? heroProducts
       : heroProducts.length === 1
-        ? [heroProducts[0], HERO_FALLBACK as { name: string; slug: string; image: string; badge: string }]
-        : [HERO_FALLBACK];
+        ? [heroProducts[0], { ...HERO_FALLBACK, image: "" } as { name: string; slug: string; image: string; badge: string }]
+        : [{ ...HERO_FALLBACK, image: "" } as { name: string; slug: string; image: string; badge: string }];
   const displayIndex = Math.min(heroIndex, heroList.length - 1);
   const currentItem = heroList[displayIndex];
+  const isFallbackItem = !currentItem || !("id" in currentItem);
+  const fallbackImage =
+    settings?.heroFallbackImage?.trim() ||
+    heroProducts[0]?.image ||
+    "/images/hero-product.png";
   const current = currentItem
     ? {
         name: currentItem.name,
         slug: currentItem.slug,
-        image: currentItem.image,
-        badge: (currentItem as Product).badge || (currentItem as typeof HERO_FALLBACK).badge || "Featured",
+        image: isFallbackItem ? fallbackImage : (currentItem as Product).image,
+        badge: (currentItem as Product).badge || (currentItem as { badge?: string }).badge || "Featured",
       }
-    : HERO_FALLBACK;
+    : { ...HERO_FALLBACK, image: fallbackImage };
 
   return (
     <section className="relative overflow-hidden py-24 sm:py-36 lg:py-44" data-testid="section-hero">
