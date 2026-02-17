@@ -1,3 +1,4 @@
+import { put } from "@vercel/blob";
 import cookieSession from "cookie-session";
 import express from "express";
 import multer from "multer";
@@ -39,27 +40,29 @@ app.post("/api/upload", requireAdmin, upload.single("image"), async (req: any, r
   try {
     if (!req.file) return res.status(400).json({ error: "No image file provided" });
 
-    // On Vercel serverless there is no persistent disk; use local uploads folder when available
-    const uploadsDir = path.join(process.cwd(), "uploads");
-    const canWrite = !process.env.VERCEL && (() => {
-      try {
-        if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-        return true;
-      } catch {
-        return false;
-      }
-    })();
+    const ext = path.extname(req.file.originalname);
+    const name = `uploads/${Date.now()}-${randomUUID().slice(0, 8)}${ext}`;
 
-    if (!canWrite) {
-      return res.status(503).json({
-        error: "Image upload on Vercel is not configured. Use local deploy for uploads or add Vercel Blob.",
+    // Vercel: use Vercel Blob (needs BLOB_READ_WRITE_TOKEN + Blob store in dashboard)
+    if (process.env.VERCEL && process.env.BLOB_READ_WRITE_TOKEN) {
+      const blob = await put(name, req.file.buffer, {
+        access: "public",
+        contentType: req.file.mimetype,
       });
+      return res.json({ url: blob.url });
     }
 
-    const ext = path.extname(req.file.originalname);
-    const name = `${Date.now()}-${randomUUID().slice(0, 8)}${ext}`;
-    fs.writeFileSync(path.join(uploadsDir, name), req.file.buffer);
-    return res.json({ url: `/uploads/${name}` });
+    // Local: save to uploads/ folder
+    const uploadsDir = path.join(process.cwd(), "uploads");
+    try {
+      if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+      fs.writeFileSync(path.join(uploadsDir, path.basename(name)), req.file.buffer);
+      return res.json({ url: `/uploads/${path.basename(name)}` });
+    } catch {
+      return res.status(503).json({
+        error: "Image upload not available. On Vercel: add Blob store and BLOB_READ_WRITE_TOKEN.",
+      });
+    }
   } catch (err) {
     console.error("Upload error:", err);
     res.status(500).json({ error: "Upload failed" });

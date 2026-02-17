@@ -1,6 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import fs from "fs";
+import path from "path";
+import { put } from "@vercel/blob";
 import { storage } from "./storage.js";
 import { insertProductSchema, insertOrderSchema, insertReviewSchema, insertSubscriberSchema, insertContactSubmissionSchema } from "../shared/schema.js";
 import {
@@ -13,7 +15,6 @@ import {
 } from "../shared/color-variants.js";
 import { randomUUID } from "crypto";
 import multer from "multer";
-import path from "path";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -162,11 +163,27 @@ export async function registerRoutes(
       return res.status(400).json({ error: "No image file provided" });
     }
     const ext = path.extname(req.file.originalname);
-    const name = `${Date.now()}-${randomUUID().slice(0, 8)}${ext}`;
-    const uploadsDir = path.join(process.cwd(), "uploads");
-    if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-    fs.writeFileSync(path.join(uploadsDir, name), req.file.buffer);
-    res.json({ url: `/uploads/${name}` });
+    const name = `uploads/${Date.now()}-${randomUUID().slice(0, 8)}${ext}`;
+    try {
+      if (process.env.VERCEL && process.env.BLOB_READ_WRITE_TOKEN) {
+        const blob = await put(name, req.file.buffer, {
+          access: "public",
+          contentType: req.file.mimetype,
+        });
+        return res.json({ url: blob.url });
+      }
+      const uploadsDir = path.join(process.cwd(), "uploads");
+      if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+      fs.writeFileSync(path.join(uploadsDir, path.basename(name)), req.file.buffer);
+      return res.json({ url: `/uploads/${path.basename(name)}` });
+    } catch (err) {
+      console.error("Upload error:", err);
+      return res.status(500).json({
+        error: process.env.VERCEL
+          ? "Image upload failed. Add Blob store in Vercel and set BLOB_READ_WRITE_TOKEN."
+          : "Upload failed",
+      });
+    }
   });
 
   app.get("/api/paypal/config", async (_req, res) => {
