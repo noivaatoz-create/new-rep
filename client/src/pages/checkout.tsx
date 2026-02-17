@@ -192,6 +192,7 @@ export default function CheckoutPage() {
     script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(paypalConfig.clientId)}&currency=${encodeURIComponent(settings?.currency || "USD")}&intent=capture`;
     script.async = true;
     script.dataset.paypalSdk = "true";
+    script.dataset.pageType = "checkout";
     script.onload = renderButtons;
     script.onerror = () => {
       console.error("[PayPal] SDK script failed to load");
@@ -380,14 +381,15 @@ export default function CheckoutPage() {
                   )}
                 </div>
                 {paymentMethod === "paypal" && (
-                  <div className="mt-5 rounded-xl border border-border/60 bg-background p-5 space-y-3">
+                  <div className="mt-5 rounded-xl border border-border/60 bg-white dark:bg-zinc-900 p-5 space-y-3">
                     {!paypalConfig?.enabled || !paypalConfig?.clientId ? (
-                      <p className="text-sm text-amber-400">
+                      <p className="text-sm text-amber-600 dark:text-amber-400">
                         PayPal is not configured. Add PayPal Client ID in Admin → Settings to enable PayPal checkout.
                       </p>
                     ) : (
                       <>
-                        <p className="text-xs text-muted-foreground">Click the button below to pay with PayPal.</p>
+                        <p className="text-xs text-zinc-600 dark:text-zinc-400">Click the button below to pay with PayPal.</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-500">If the card form is hard to read, try zooming the page (Ctrl/Cmd + +) or log in with your PayPal account.</p>
                         <div id="paypal-button-container" data-testid="paypal-button-container" className="min-h-[44px]" />
                         {paypalLoading && (
                           <p className="text-xs text-muted-foreground">Processing payment...</p>
