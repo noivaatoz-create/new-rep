@@ -445,21 +445,31 @@ export async function registerRoutes(
     }).catch((err) => console.error("[EMAIL] Invoice send failed:", err));
 
     // Push order to Veeqo if configured (non-blocking)
-    pushOrderToVeeqo({
-      orderNumber: order.orderNumber,
-      customerName: order.customerName,
-      customerEmail: order.customerEmail,
-      shippingAddress: order.shippingAddress,
-      items: order.items,
-      paymentProvider: order.paymentProvider ?? null,
-      paymentId: order.paymentId ?? null,
-    }).then((r) => {
-      if (r.ok) {
-        if (r.veeqoOrderId) console.log("[VEEQO] Order pushed:", order.orderNumber, "→ Veeqo ID", r.veeqoOrderId);
-      } else {
-        console.warn("[VEEQO] Push failed:", order.orderNumber, r.error);
+    (async () => {
+      try {
+        const settings = await storage.getSettings();
+        const settingsObj: Record<string, string> = {};
+        for (const s of settings) {
+          settingsObj[s.key] = s.value;
+        }
+        const result = await pushOrderToVeeqo({
+          orderNumber: order.orderNumber,
+          customerName: order.customerName,
+          customerEmail: order.customerEmail,
+          shippingAddress: order.shippingAddress,
+          items: order.items,
+          paymentProvider: order.paymentProvider ?? null,
+          paymentId: order.paymentId ?? null,
+        }, settingsObj);
+        if (result.ok) {
+          if (result.veeqoOrderId) console.log("[VEEQO] Order pushed:", order.orderNumber, "→ Veeqo ID", result.veeqoOrderId);
+        } else {
+          console.warn("[VEEQO] Push failed:", order.orderNumber, result.error);
+        }
+      } catch (err) {
+        console.error("[VEEQO] Push error:", err);
       }
-    }).catch((err) => console.error("[VEEQO] Push error:", err));
+    })();
 
     res.status(201).json(order);
   });

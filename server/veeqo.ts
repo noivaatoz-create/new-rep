@@ -49,15 +49,22 @@ function splitName(full: string): { first_name: string; last_name: string } {
 /**
  * Push a single order to Veeqo. No-op if env is not configured.
  * Returns { ok: true, veeqoOrderId?: number } or { ok: false, error: string }.
+ * @param order Order data to push
+ * @param settings Optional settings object (from database). If not provided, reads from env vars.
  */
-export async function pushOrderToVeeqo(order: OrderForVeeqo): Promise<
+export async function pushOrderToVeeqo(
+  order: OrderForVeeqo,
+  settings?: Record<string, string>
+): Promise<
   | { ok: true; veeqoOrderId?: number }
   | { ok: false; error: string }
 > {
-  const apiKey = getEnv("VEEQO_API_KEY");
-  const channelId = getEnv("VEEQO_CHANNEL_ID");
-  const deliveryMethodId = getEnv("VEEQO_DELIVERY_METHOD_ID");
-  const defaultSellableId = getEnv("VEEQO_DEFAULT_SELLABLE_ID");
+  // Check settings from database first, fallback to env vars
+  const apiKey = settings?.veeqoApiKey || getEnv("VEEQO_API_KEY");
+  const channelId = settings?.veeqoChannelId || getEnv("VEEQO_CHANNEL_ID");
+  const deliveryMethodId = settings?.veeqoDeliveryMethodId || getEnv("VEEQO_DELIVERY_METHOD_ID");
+  const defaultSellableId = settings?.veeqoDefaultSellableId || getEnv("VEEQO_DEFAULT_SELLABLE_ID");
+  const defaultCountry = settings?.veeqoDefaultCountry || getEnv("VEEQO_DEFAULT_COUNTRY");
 
   if (!apiKey || !channelId || !deliveryMethodId) {
     return { ok: false, error: "Veeqo not configured (VEEQO_API_KEY, VEEQO_CHANNEL_ID, VEEQO_DELIVERY_METHOD_ID)" };
@@ -85,7 +92,7 @@ export async function pushOrderToVeeqo(order: OrderForVeeqo): Promise<
         first_name,
         last_name: last_name || first_name,
         address1: order.shippingAddress || "Address not provided",
-        country: getEnv("VEEQO_DEFAULT_COUNTRY") || "US",
+        country: defaultCountry || "US",
       },
       line_items_attributes: order.items.map((item) => ({
         sellable_id: sellableId,

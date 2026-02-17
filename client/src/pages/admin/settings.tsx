@@ -44,6 +44,11 @@ interface SettingsForm {
   socialYoutube: string;
   socialTiktok: string;
   socialLinkedin: string;
+  veeqoApiKey: string;
+  veeqoChannelId: string;
+  veeqoDeliveryMethodId: string;
+  veeqoDefaultSellableId: string;
+  veeqoDefaultCountry: string;
 }
 
 const defaultForm: SettingsForm = {
@@ -84,6 +89,11 @@ const defaultForm: SettingsForm = {
   socialYoutube: "",
   socialTiktok: "",
   socialLinkedin: "",
+  veeqoApiKey: "",
+  veeqoChannelId: "",
+  veeqoDeliveryMethodId: "",
+  veeqoDefaultSellableId: "",
+  veeqoDefaultCountry: "US",
 };
 
 function Toggle({ value, onToggle, testId }: { value: string; onToggle: () => void; testId: string }) {
@@ -168,6 +178,11 @@ export default function AdminSettings() {
         socialYoutube: settings.socialYoutube || "",
         socialTiktok: settings.socialTiktok || "",
         socialLinkedin: settings.socialLinkedin || "",
+        veeqoApiKey: settings.veeqoApiKey || "",
+        veeqoChannelId: settings.veeqoChannelId || "",
+        veeqoDeliveryMethodId: settings.veeqoDeliveryMethodId || "",
+        veeqoDefaultSellableId: settings.veeqoDefaultSellableId || "",
+        veeqoDefaultCountry: settings.veeqoDefaultCountry || "US",
       });
     }
   }, [settings]);
@@ -208,6 +223,16 @@ export default function AdminSettings() {
       freeShippingThreshold: form.freeShippingThreshold,
       shippingFlatRate: form.shippingFlatRate,
       orderPrefix: form.orderPrefix,
+    });
+  };
+
+  const saveVeeqo = () => {
+    saveMutation.mutate({
+      veeqoApiKey: form.veeqoApiKey,
+      veeqoChannelId: form.veeqoChannelId,
+      veeqoDeliveryMethodId: form.veeqoDeliveryMethodId,
+      veeqoDefaultSellableId: form.veeqoDefaultSellableId,
+      veeqoDefaultCountry: form.veeqoDefaultCountry,
     });
   };
 
@@ -394,6 +419,93 @@ export default function AdminSettings() {
                       onToggle={() => setForm({ ...form, codEnabled: form.codEnabled === "true" ? "false" : "true" })}
                       testId="toggle-cod-enabled"
                     />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-card border border-border rounded-md p-6" data-testid="card-veeqo-settings">
+                <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
+                  <div className="flex items-center gap-3">
+                    <Store className="h-5 w-5 text-primary" />
+                    <h3 className="text-foreground text-base font-semibold">Veeqo Integration</h3>
+                  </div>
+                  <button
+                    onClick={saveVeeqo}
+                    disabled={saveMutation.isPending}
+                    className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-foreground transition-colors disabled:opacity-50"
+                    data-testid="button-save-veeqo"
+                  >
+                    <Save className="h-4 w-4" />
+                    {saveMutation.isPending ? "Saving..." : "Save"}
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <p className="text-muted-foreground text-sm mb-4">
+                    Automatically sync orders to Veeqo. Get your API credentials from{" "}
+                    <a href="https://app.veeqo.com/settings/integrations/api" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                      Veeqo Settings → Integrations → API
+                    </a>
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelClass}>API Key</label>
+                      <input
+                        type="password"
+                        value={form.veeqoApiKey}
+                        onChange={(e) => setForm({ ...form, veeqoApiKey: e.target.value })}
+                        className={inputClass}
+                        placeholder="your_api_key"
+                        data-testid="input-veeqo-api-key"
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Channel ID</label>
+                      <input
+                        type="text"
+                        value={form.veeqoChannelId}
+                        onChange={(e) => setForm({ ...form, veeqoChannelId: e.target.value })}
+                        className={inputClass}
+                        placeholder="12345"
+                        data-testid="input-veeqo-channel-id"
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Delivery Method ID</label>
+                      <input
+                        type="text"
+                        value={form.veeqoDeliveryMethodId}
+                        onChange={(e) => setForm({ ...form, veeqoDeliveryMethodId: e.target.value })}
+                        className={inputClass}
+                        placeholder="67890"
+                        data-testid="input-veeqo-delivery-method-id"
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Default Sellable ID</label>
+                      <input
+                        type="text"
+                        value={form.veeqoDefaultSellableId}
+                        onChange={(e) => setForm({ ...form, veeqoDefaultSellableId: e.target.value })}
+                        className={inputClass}
+                        placeholder="11111"
+                        data-testid="input-veeqo-default-sellable-id"
+                      />
+                      <p className="text-muted-foreground text-xs mt-1">Veeqo product/sellable ID to use for all items</p>
+                    </div>
+                    <div>
+                      <label className={labelClass}>Default Country</label>
+                      <input
+                        type="text"
+                        value={form.veeqoDefaultCountry}
+                        onChange={(e) => setForm({ ...form, veeqoDefaultCountry: e.target.value })}
+                        className={inputClass}
+                        placeholder="US"
+                        data-testid="input-veeqo-default-country"
+                      />
+                      <p className="text-muted-foreground text-xs mt-1">ISO country code (e.g., US, GB, CA)</p>
+                    </div>
                   </div>
                 </div>
               </div>
