@@ -92,7 +92,19 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     placeOrderAfterPayPalRef.current = async (paymentId: string) => {
-      if (items.length === 0) return;
+      if (items.length === 0) {
+        console.error("[PayPal] No items in cart");
+        return;
+      }
+      if (!isShippingComplete) {
+        console.error("[PayPal] Shipping info incomplete");
+        toast({
+          title: "Shipping info required",
+          description: "Please complete shipping information first.",
+          variant: "destructive",
+        });
+        return;
+      }
       setIsSubmitting(true);
       try {
         const orderData = {
@@ -114,18 +126,25 @@ export default function CheckoutPage() {
           paymentId,
           status: "paid",
         };
+        console.log("[PayPal] Placing order automatically...", orderData);
         const res = await apiRequest("POST", "/api/orders", orderData);
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+          throw new Error(err.error || "Order placement failed");
+        }
         const order = await res.json();
         clearCart();
         toast({ title: "Order confirmed!", description: "Check your email for the invoice. Redirecting…" });
         navigate(`/checkout/success?order=${order.orderNumber}`);
-      } catch {
-        toast({ title: "Error", description: "Failed to place order. Please try again.", variant: "destructive" });
+      } catch (err) {
+        console.error("[PayPal] Auto-place order failed:", err);
+        const message = err instanceof Error ? err.message : "Failed to place order";
+        toast({ title: "Error", description: message, variant: "destructive" });
       } finally {
         setIsSubmitting(false);
       }
     };
-  }, [form, items, total, shipping, tax, grandTotal, clearCart, navigate, toast]);
+  }, [form, items, total, shipping, tax, grandTotal, isShippingComplete, clearCart, navigate, toast]);
 
   useEffect(() => {
     if (paymentMethod !== "paypal") {
@@ -201,16 +220,23 @@ export default function CheckoutPage() {
               const response = await apiRequest("POST", "/api/paypal/capture-order", {
                 orderId: data.orderID,
               });
+              if (!response.ok) {
+                const err = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
+                throw new Error(err.error || "Capture failed");
+              }
               const capture = await response.json();
               const paymentId = capture.id || data.orderID;
               setPaypalOrderId(paymentId);
               setPaypalApproved(true);
-              toast({ title: "Payment approved", description: "Placing your order…" });
-              placeOrderAfterPayPalRef.current(paymentId);
-            } catch {
+              console.log("[PayPal] Payment captured, auto-placing order...", paymentId);
+              toast({ title: "Payment approved", description: "Placing your order automatically…" });
+              await placeOrderAfterPayPalRef.current(paymentId);
+            } catch (err) {
+              console.error("[PayPal] Capture error:", err);
+              const message = err instanceof Error ? err.message : "Unable to process payment";
               toast({
                 title: "Payment capture failed",
-                description: "Unable to process payment. Please try again.",
+                description: message,
                 variant: "destructive",
               });
             } finally {
@@ -471,11 +497,11 @@ export default function CheckoutPage() {
                         )}
                         {paypalApproved ? (
                           <p className="text-xs text-primary font-medium" data-testid="text-paypal-approved">
-                            Payment approved. Click &quot;Place Order&quot; below to complete your purchase.
+                            Payment approved. Order is being placed automatically…
                           </p>
                         ) : (
                           <p className="text-xs text-muted-foreground">
-                            After paying with PayPal, click &quot;Place Order&quot; to confirm.
+                            After payment approval, your order will be placed automatically.
                           </p>
                         )}
                       </>
