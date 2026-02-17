@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Droplets, Waves, VolumeX, CheckCircle, XCircle, Minus } from "lucide-react";
@@ -13,41 +12,25 @@ const HERO_FALLBACK = {
 };
 
 function HeroSection() {
-  const [heroIndex, setHeroIndex] = useState(0);
   const { data: products } = useQuery<Product[]>({
     queryKey: ["/api/products"],
     staleTime: 60_000,
   });
   const { data: settings } = useQuery<Record<string, string>>({ queryKey: ["/api/settings"] });
-  // Hero: pehle admin ne "Hero" toggle ON kiye products, warna featured + baki (pehle 4)
+  // Hero: sirf ek image — pehle "Hero" toggle wala product, warna featured, warna fallback
   const showOnHeroList = products?.filter((p) => (p as { showOnHero?: boolean }).showOnHero) ?? [];
   const featured = products?.filter((p) => p.isFeatured) ?? [];
   const rest = products?.filter((p) => !p.isFeatured) ?? [];
-  const heroProducts =
-    showOnHeroList.length > 0
-      ? showOnHeroList.slice(0, 4)
-      : (featured.length || rest.length)
-        ? [...featured, ...rest].slice(0, 4)
-        : [];
-  const heroList =
-    heroProducts.length >= 2
-      ? heroProducts
-      : heroProducts.length === 1
-        ? [heroProducts[0], { ...HERO_FALLBACK, image: "" } as { name: string; slug: string; image: string; badge: string }]
-        : [{ ...HERO_FALLBACK, image: "" } as { name: string; slug: string; image: string; badge: string }];
-  const displayIndex = Math.min(heroIndex, heroList.length - 1);
-  const currentItem = heroList[displayIndex];
-  const isFallbackItem = !currentItem || !("id" in currentItem);
+  const heroProduct =
+    showOnHeroList[0] ?? featured[0] ?? rest[0] ?? null;
   const fallbackImage =
-    settings?.heroFallbackImage?.trim() ||
-    heroProducts[0]?.image ||
-    "/images/hero-product.png";
-  const current = currentItem
+    settings?.heroFallbackImage?.trim() || "/images/hero-product.png";
+  const current = heroProduct
     ? {
-        name: currentItem.name,
-        slug: currentItem.slug,
-        image: isFallbackItem ? fallbackImage : (currentItem as Product).image,
-        badge: (currentItem as Product).badge || (currentItem as { badge?: string }).badge || "Featured",
+        name: heroProduct.name,
+        slug: heroProduct.slug,
+        image: heroProduct.image,
+        badge: heroProduct.badge || "Featured",
       }
     : { ...HERO_FALLBACK, image: fallbackImage };
 
@@ -122,25 +105,6 @@ function HeroSection() {
                     </Link>
                   </div>
                 </div>
-                {/* Toggle: jo ON ho us product hero mein dikhe */}
-                {heroList.length > 1 && (
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-2 z-20 px-3 py-2 rounded-full bg-black/40 backdrop-blur-sm">
-                    {heroList.map((item, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        aria-label={`Show ${item.name}`}
-                        onClick={() => setHeroIndex(i)}
-                        className={`h-2.5 rounded-full transition-all duration-200 ${
-                          i === displayIndex
-                            ? "w-8 bg-white"
-                            : "w-2.5 bg-white/50 hover:bg-white/70"
-                        }`}
-                        data-testid={`hero-toggle-${i}`}
-                      />
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
           </div>
