@@ -3,7 +3,7 @@ import { AdminSidebar, AdminHeader } from "./dashboard";
 import type { ProductWithColorVariants, ProductColorVariant } from "@shared/color-variants";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Package, X, List, Image, Box, Wrench, ToggleLeft, ToggleRight, Upload, Link, Star, Palette, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, Edit, Trash2, Package, X, List, Image, Box, Wrench, ToggleLeft, ToggleRight, Upload, Link, Star, Palette, ArrowUp, ArrowDown, Layout } from "lucide-react";
 import { useState, useRef, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -19,7 +19,7 @@ export default function AdminProducts() {
   const [form, setForm] = useState({
     name: "", slug: "", shortDescription: "", longDescription: "",
     price: "", compareAtPrice: "", category: "Best Sellers", badge: "",
-    image: "", stock: "100", isActive: true, isFeatured: false,
+    image: "", stock: "100", isActive: true, isFeatured: false, showOnHero: false,
     features: [] as string[],
     specs: {} as Record<string, string>,
     whatsInBox: [] as string[],
@@ -120,7 +120,7 @@ export default function AdminProducts() {
     setForm({
       name: "", slug: "", shortDescription: "", longDescription: "",
       price: "", compareAtPrice: "", category: "Best Sellers", badge: "",
-      image: "", stock: "100", isActive: true, isFeatured: false,
+      image: "", stock: "100", isActive: true, isFeatured: false, showOnHero: false,
       features: [], specs: {}, whatsInBox: [], images: [],
       colorVariants: [],
     });
@@ -137,6 +137,7 @@ export default function AdminProducts() {
       image: p.image, stock: String(p.stock),
       isActive: p.isActive,
       isFeatured: p.isFeatured,
+      showOnHero: "showOnHero" in p ? (p as { showOnHero: boolean }).showOnHero : false,
       features: p.features || [],
       specs: p.specs || {},
       whatsInBox: p.whatsInBox || [],
@@ -189,6 +190,7 @@ export default function AdminProducts() {
       stock: stockNum,
       isActive: form.isActive,
       isFeatured: form.isFeatured,
+      showOnHero: form.showOnHero,
       features: form.features.filter(f => f.trim()),
       specs: Object.fromEntries(specEntries.filter(e => e.key.trim()).map(e => [e.key, e.value])),
       whatsInBox: form.whatsInBox.filter(w => w.trim()),
@@ -234,6 +236,7 @@ export default function AdminProducts() {
                     <th className="p-4 text-muted-foreground text-xs font-medium uppercase tracking-wider">Stock</th>
                     <th className="p-4 text-muted-foreground text-xs font-medium uppercase tracking-wider">Status</th>
                     <th className="p-4 text-muted-foreground text-xs font-medium uppercase tracking-wider">Featured</th>
+                    <th className="p-4 text-muted-foreground text-xs font-medium uppercase tracking-wider">Hero</th>
                     <th className="p-4 text-muted-foreground text-xs font-medium uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
@@ -280,6 +283,19 @@ export default function AdminProducts() {
                           data-testid={`button-toggle-featured-${product.id}`}
                         >
                           <Star className={`h-5 w-5 ${product.isFeatured ? "text-primary fill-primary" : "text-muted-foreground"}`} />
+                        </button>
+                      </td>
+                      <td className="p-4">
+                        <button
+                          onClick={async () => {
+                            await apiRequest("PATCH", `/api/products/${product.id}`, { showOnHero: !("showOnHero" in product && product.showOnHero) });
+                            queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+                          }}
+                          className="p-1.5 rounded-md hover:bg-muted transition-colors"
+                          title="Hero pe show karein"
+                          data-testid={`button-toggle-hero-${product.id}`}
+                        >
+                          <Layout className={`h-5 w-5 ${"showOnHero" in product && product.showOnHero ? "text-primary fill-primary" : "text-muted-foreground"}`} />
                         </button>
                       </td>
                       <td className="p-4">
@@ -436,6 +452,21 @@ export default function AdminProducts() {
                   <Star className={`h-6 w-6 ${form.isFeatured ? "text-primary fill-primary" : "text-muted-foreground"}`} />
                   <span className={form.isFeatured ? "text-primary font-medium" : "text-muted-foreground"}>
                     {form.isFeatured ? "Featured" : "Not Featured"}
+                  </span>
+                </button>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <label className="text-sm font-medium text-foreground">Hero</label>
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, showOnHero: !form.showOnHero })}
+                  className="flex items-center gap-2 text-sm"
+                  data-testid="button-toggle-show-on-hero"
+                  title="Home hero pe show hoga"
+                >
+                  <Layout className={`h-6 w-6 ${form.showOnHero ? "text-primary fill-primary" : "text-muted-foreground"}`} />
+                  <span className={form.showOnHero ? "text-primary font-medium" : "text-muted-foreground"}>
+                    {form.showOnHero ? "Hero pe dikhe" : "Hero pe nahi"}
                   </span>
                 </button>
               </div>

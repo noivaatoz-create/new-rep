@@ -21,6 +21,7 @@ export const products = pgTable("products", {
   stock: integer("stock").notNull().default(100),
   isActive: boolean("is_active").notNull().default(true),
   isFeatured: boolean("is_featured").notNull().default(false),
+  showOnHero: boolean("show_on_hero").notNull().default(false),
 });
 
 export const cartItems = pgTable("cart_items", {

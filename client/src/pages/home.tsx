@@ -19,12 +19,16 @@ function HeroSection() {
     queryKey: ["/api/products"],
     staleTime: 60_000,
   });
-  // Hero toggle: featured pehle, phir baki; 1 product ho to fallback add karke bhi toggle dikhao
+  // Hero: pehle admin ne "Hero" toggle ON kiye products, warna featured + baki (pehle 4)
+  const showOnHeroList = products?.filter((p) => (p as { showOnHero?: boolean }).showOnHero) ?? [];
   const featured = products?.filter((p) => p.isFeatured) ?? [];
   const rest = products?.filter((p) => !p.isFeatured) ?? [];
-  const heroProducts = (featured.length || rest.length)
-    ? [...featured, ...rest].slice(0, 4)
-    : [];
+  const heroProducts =
+    showOnHeroList.length > 0
+      ? showOnHeroList.slice(0, 4)
+      : (featured.length || rest.length)
+        ? [...featured, ...rest].slice(0, 4)
+        : [];
   const heroList =
     heroProducts.length >= 2
       ? heroProducts
