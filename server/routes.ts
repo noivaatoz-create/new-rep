@@ -498,6 +498,18 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/subscribers", requireAdmin, async (_req, res) => {
+    const subscribers = await storage.getSubscribers();
+    res.json(subscribers);
+  });
+
+  app.delete("/api/subscribers/:id", requireAdmin, async (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid ID" });
+    await storage.deleteSubscriber(id);
+    res.status(204).send();
+  });
+
   app.get("/api/settings", async (_req, res) => {
     const settings = await storage.getSettings();
     const settingsObj: Record<string, string> = {};

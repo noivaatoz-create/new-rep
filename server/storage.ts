@@ -1,5 +1,5 @@
 import { db } from "./db.js";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import {
   products, orders, reviews, subscribers, siteSettings, contactSubmissions,
   type Product, type InsertProduct,
@@ -28,6 +28,8 @@ export interface IStorage {
   createReview(review: InsertReview): Promise<Review>;
 
   createSubscriber(subscriber: InsertSubscriber): Promise<Subscriber>;
+  getSubscribers(): Promise<Subscriber[]>;
+  deleteSubscriber(id: number): Promise<void>;
 
   getSettings(): Promise<SiteSetting[]>;
   getSetting(key: string): Promise<SiteSetting | undefined>;
@@ -108,6 +110,14 @@ export class DatabaseStorage implements IStorage {
   async createSubscriber(subscriber: InsertSubscriber): Promise<Subscriber> {
     const [created] = await db.insert(subscribers).values(subscriber).returning();
     return created;
+  }
+
+  async getSubscribers(): Promise<Subscriber[]> {
+    return db.select().from(subscribers).orderBy(desc(subscribers.createdAt));
+  }
+
+  async deleteSubscriber(id: number): Promise<void> {
+    await db.delete(subscribers).where(eq(subscribers.id, id));
   }
 
   async getSettings(): Promise<SiteSetting[]> {
