@@ -308,6 +308,27 @@ export async function registerRoutes(
     res.json({ isAdmin: req.session?.isAdmin === true, NODE_ENV: process.env.NODE_ENV });
   });
 
+  app.get("/api/debug/db", (_req, res) => {
+    const fromNeon = process.env.NEON_DATABASE_URL?.trim();
+    const fromDb = process.env.DATABASE_URL?.trim();
+    const url = fromNeon || fromDb;
+    const source = fromNeon ? "NEON_DATABASE_URL" : fromDb ? "DATABASE_URL" : null;
+    if (!url) return res.json({ ok: false, error: "DATABASE_URL / NEON_DATABASE_URL not set", host: null, source });
+    try {
+      const u = new URL(url);
+      const host = u.hostname;
+      const ok = host.length > 3 && host !== "base" && (process.env.VERCEL ? !/^localhost$/i.test(host) : true);
+      return res.json({
+        ok,
+        host,
+        source,
+        hint: !ok ? "On Vercel set NEON_DATABASE_URL to your Neon URL (so Vercel Postgres doesn't override DATABASE_URL)." : null,
+      });
+    } catch (e) {
+      return res.json({ ok: false, error: "URL invalid", host: null, source });
+    }
+  });
+
   app.post("/api/products", requireAdmin, async (req, res) => {
     try {
       const body = req.body as Record<string, unknown>;
@@ -384,9 +405,15 @@ export async function registerRoutes(
   app.delete("/api/products/:id", requireAdmin, async (req, res) => {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) return res.status(400).json({ error: "Invalid ID" });
-    await storage.deleteProduct(id);
-    await saveProductColorVariants(id, []);
-    return res.status(204).send();
+    try {
+      await saveProductColorVariants(id, []);
+      await storage.deleteProduct(id);
+      return res.status(204).send();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err ?? "Unknown error");
+      console.error("Failed to delete product:", id, message, err);
+      return res.status(500).json({ error: `Failed to delete product: ${message}` });
+    }
   });
 
   app.get("/api/orders", requireAdmin, async (_req, res) => {

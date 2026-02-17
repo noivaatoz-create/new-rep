@@ -107,6 +107,12 @@ export default function AdminProducts() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       toast({ title: "Product Deleted" });
+      setDeleteProductId(null);
+    },
+    onError: (error: unknown) => {
+      const msg = error instanceof Error ? error.message : String(error ?? "");
+      const description = msg.replace(/^\d+:\s*/, "") || "Could not delete product.";
+      toast({ title: "Delete Failed", description, variant: "destructive" });
     },
   });
 
@@ -865,12 +871,12 @@ export default function AdminProducts() {
                 onClick={() => {
                   if (deleteProductId !== null) {
                     deleteMutation.mutate(deleteProductId);
-                    setDeleteProductId(null);
                   }
                 }}
+                disabled={deleteMutation.isPending}
                 data-testid="button-confirm-delete"
               >
-                Delete
+                {deleteMutation.isPending ? "Deleting..." : "Delete"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
