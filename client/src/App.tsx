@@ -30,6 +30,7 @@ import AdminNewsletter from "@/pages/admin/newsletter";
 import AdminLogin from "@/pages/admin/login";
 import { AdminGuard } from "@/lib/admin-auth";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 function CustomerLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -44,6 +45,7 @@ function CustomerLayout({ children }: { children: React.ReactNode }) {
 
 function Router() {
   return (
+    <ErrorBoundary>
     <Switch>
       <Route path="/">
         {() => <CustomerLayout><HomePage /></CustomerLayout>}
@@ -110,6 +112,7 @@ function Router() {
         {() => <CustomerLayout><NotFound /></CustomerLayout>}
       </Route>
     </Switch>
+    </ErrorBoundary>
   );
 }
 

@@ -21,10 +21,10 @@ export default function ProductDetailPage() {
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const [selectedImage, setSelectedImage] = useState("");
 
-  const product = products?.find((p) => p.slug === slug);
+  const product = slug ? products?.find((p) => p.slug === slug) : undefined;
   const productReviews = reviews?.filter((r) => r.productId === product?.id) || [];
 
-  if (isLoading) {
+  if (!slug || isLoading) {
     return (
       <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
@@ -57,15 +57,17 @@ export default function ProductDetailPage() {
     );
   }
 
-  const specs = product.specs as Record<string, string> | null;
-  const features = product.features || [];
-  const whatsInBox = product.whatsInBox || [];
-  const colorVariants = (product.colorVariants || []).filter((variant: ProductColorVariant) => variant.images?.length > 0);
+  const specs = (product.specs != null ? product.specs : null) as Record<string, string> | null;
+  const features = Array.isArray(product.features) ? product.features : [];
+  const whatsInBox = Array.isArray(product.whatsInBox) ? product.whatsInBox : [];
+  const colorVariants = (Array.isArray(product.colorVariants) ? product.colorVariants : []).filter(
+    (variant: ProductColorVariant) => variant?.images?.length > 0
+  );
 
-  const fallbackImages = [product.image, ...(product.images || [])].filter(Boolean);
+  const fallbackImages = [product.image, ...(Array.isArray(product.images) ? product.images : [])].filter(Boolean);
   const activeVariant = colorVariants[selectedColorIndex];
   const galleryImages = (activeVariant?.images?.length ? activeVariant.images : fallbackImages).filter(Boolean);
-  const mainImage = selectedImage || galleryImages[0] || product.image;
+  const mainImage = selectedImage || galleryImages[0] || product.image || "";
 
   useEffect(() => {
     setSelectedColorIndex(0);
