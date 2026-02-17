@@ -214,14 +214,11 @@ export default function AdminDashboard() {
     return { path: pathStr, area: areaStr };
   })();
 
-  const resetMutation = useMutation({
-    mutationFn: () => apiRequest("DELETE", "/api/orders"),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
-      toast({ title: "Revenue Reset", description: "All order data has been cleared." });
-      setShowResetDialog(false);
-    },
-  });
+  const handleResetFilters = () => {
+    setPeriod("all");
+    setShowResetDialog(false);
+    toast({ title: "Filters Reset", description: "View reset to show all time data. Orders are preserved." });
+  };
 
   const kpis = [
     { label: "Total Revenue", value: `$${totalRevenue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, icon: "payments" },
@@ -257,11 +254,11 @@ export default function AdminDashboard() {
             </div>
             <button
               onClick={() => setShowResetDialog(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-red-500/30 text-red-400 text-xs font-medium hover:bg-red-500/10 transition-all"
-              data-testid="button-reset-revenue"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border text-muted-foreground text-xs font-medium hover:text-foreground hover:border-primary/50 transition-all"
+              data-testid="button-reset-filters"
             >
               <Trash2 className="h-3.5 w-3.5" />
-              Reset Data
+              Reset Filters
             </button>
           </div>
 
@@ -405,19 +402,19 @@ export default function AdminDashboard() {
       <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
         <AlertDialogContent className="bg-background border-border text-foreground">
           <AlertDialogHeader>
-            <AlertDialogTitle>Reset All Revenue Data?</AlertDialogTitle>
+            <AlertDialogTitle>Reset Filters?</AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground">
-              This will permanently delete all orders. Revenue will reset to $0.00. This action cannot be undone.
+              This will reset the time period filter to "All Time". Orders will not be deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="border-border text-muted-foreground" data-testid="button-cancel-reset">Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => resetMutation.mutate()}
-              className="bg-red-600 hover:bg-red-700 text-foreground"
+              onClick={handleResetFilters}
+              className="bg-primary hover:bg-primary/90 text-foreground"
               data-testid="button-confirm-reset"
             >
-              Reset All Data
+              Reset Filters
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
