@@ -167,16 +167,22 @@ export default function CheckoutPage() {
 
     let cancelled = false;
     const container = document.getElementById("paypal-button-container");
+    const summaryContainer = document.getElementById("paypal-button-summary");
+    const targetContainer = isShippingComplete && summaryContainer ? summaryContainer : container;
+    
     if (container) {
       container.innerHTML = "";
     }
+    if (summaryContainer) {
+      summaryContainer.innerHTML = "";
+    }
 
     const renderButtons = () => {
-      if (cancelled || !window.paypal || !container) {
+      if (cancelled || !window.paypal || !targetContainer) {
         return;
       }
 
-      container.innerHTML = "";
+      targetContainer.innerHTML = "";
       window.paypal
         .Buttons({
           style: {
@@ -253,7 +259,7 @@ export default function CheckoutPage() {
             });
           },
         })
-        .render("#paypal-button-container");
+        .render(targetContainer);
     };
 
     const existingScript = document.querySelector('script[data-paypal-sdk="true"]') as HTMLScriptElement | null;
@@ -288,7 +294,7 @@ export default function CheckoutPage() {
     return () => {
       cancelled = true;
     };
-  }, [paymentMethod, showPaypal, paypalConfig?.enabled, paypalConfig?.clientId]);
+  }, [paymentMethod, showPaypal, paypalConfig?.enabled, paypalConfig?.clientId, isShippingComplete]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -481,31 +487,17 @@ export default function CheckoutPage() {
                     </button>
                   )}
                 </div>
-                {paymentMethod === "paypal" && isShippingComplete && (
+                {paymentMethod === "paypal" && isShippingComplete && !paypalConfig?.enabled && (
                   <div className="mt-5 rounded-xl border border-border/60 bg-white dark:bg-zinc-900 p-5 space-y-3">
-                    {!paypalConfig?.enabled || !paypalConfig?.clientId ? (
-                      <p className="text-sm text-amber-600 dark:text-amber-400">
-                        PayPal is not configured. Add PayPal Client ID in Admin → Settings to enable PayPal checkout.
-                      </p>
-                    ) : (
-                      <>
-                        <p className="text-xs text-zinc-600 dark:text-zinc-400">Click the button below to pay with PayPal.</p>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-500">If the card form is hard to read, try zooming the page (Ctrl/Cmd + +) or log in with your PayPal account.</p>
-                        <div id="paypal-button-container" data-testid="paypal-button-container" className="min-h-[44px]" />
-                        {paypalLoading && (
-                          <p className="text-xs text-muted-foreground">Processing payment...</p>
-                        )}
-                        {paypalApproved ? (
-                          <p className="text-xs text-primary font-medium" data-testid="text-paypal-approved">
-                            Payment approved. Order is being placed automatically…
-                          </p>
-                        ) : (
-                          <p className="text-xs text-muted-foreground">
-                            After payment approval, your order will be placed automatically.
-                          </p>
-                        )}
-                      </>
-                    )}
+                    <p className="text-sm text-amber-600 dark:text-amber-400">
+                      PayPal is not configured. Add PayPal Client ID in Admin → Settings to enable PayPal checkout.
+                    </p>
+                  </div>
+                )}
+                {paymentMethod === "paypal" && isShippingComplete && paypalConfig?.enabled && paypalConfig?.clientId && (
+                  <div className="mt-5 rounded-xl border border-border/60 bg-white dark:bg-zinc-900 p-5 space-y-3">
+                    <p className="text-xs text-zinc-600 dark:text-zinc-400 text-center">Pay with PayPal using the button in Order Summary.</p>
+                    <div id="paypal-button-container" data-testid="paypal-button-container" className="min-h-[44px]" />
                   </div>
                 )}
                 <p className="text-muted-foreground text-xs mt-5 flex items-center gap-1.5">
@@ -554,21 +546,33 @@ export default function CheckoutPage() {
                     <span className="text-primary" data-testid="text-checkout-total">${grandTotal.toFixed(2)}</span>
                   </div>
                 </div>
-                <button
-                  type="submit"
-                  disabled={!isShippingComplete || isSubmitting || (paymentMethod === "paypal" && !paypalApproved)}
-                  className="w-full mt-7 flex items-center justify-center gap-2 rounded-full bg-foreground h-12 text-sm font-medium tracking-wide text-background transition-all hover:bg-foreground/90 disabled:opacity-50"
-                  data-testid="button-place-order"
-                >
-                  <Lock className="h-3.5 w-3.5" />
-                  {!isShippingComplete
-                    ? "Complete Shipping Info First"
-                    : isSubmitting
-                      ? "Processing..."
-                      : paymentMethod === "paypal" && !paypalApproved
-                        ? "Complete PayPal First"
-                        : "Place Order"}
-                </button>
+                {paymentMethod === "paypal" && isShippingComplete && paypalConfig?.enabled && paypalConfig?.clientId ? (
+                  <div className="mt-7 space-y-3">
+                    <div id="paypal-button-summary" data-testid="paypal-button-summary" className="min-h-[44px]" />
+                    {paypalLoading && (
+                      <p className="text-xs text-center text-muted-foreground">Processing payment...</p>
+                    )}
+                    {paypalApproved && (
+                      <p className="text-xs text-center text-primary font-medium">Order is being placed automatically…</p>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={!isShippingComplete || isSubmitting || (paymentMethod === "paypal" && !paypalApproved)}
+                    className="w-full mt-7 flex items-center justify-center gap-2 rounded-full bg-foreground h-12 text-sm font-medium tracking-wide text-background transition-all hover:bg-foreground/90 disabled:opacity-50"
+                    data-testid="button-place-order"
+                  >
+                    <Lock className="h-3.5 w-3.5" />
+                    {!isShippingComplete
+                      ? "Complete Shipping Info First"
+                      : isSubmitting
+                        ? "Processing..."
+                        : paymentMethod === "paypal" && !paypalApproved
+                          ? "Complete PayPal First"
+                          : "Place Order"}
+                  </button>
+                )}
                 <div className="flex items-center justify-center gap-2 mt-4 text-xs text-muted-foreground">
                   <ShieldCheck className="h-3.5 w-3.5" />
                   Secure checkout powered by {paymentMethod === "stripe" ? "Stripe" : paymentMethod === "paypal" ? "PayPal" : "Cash on Delivery"}
