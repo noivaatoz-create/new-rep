@@ -50,6 +50,16 @@ export default function CheckoutPage() {
   const tax = total * taxRate;
   const grandTotal = total + shipping + tax;
 
+  // Shipping form validation - payment section lock until shipping is complete
+  const isShippingComplete = Boolean(
+    form.name.trim() &&
+    form.email.trim() &&
+    form.address.trim() &&
+    form.city.trim() &&
+    form.state.trim() &&
+    form.zip.trim()
+  );
+
   const grandTotalRef = useRef(grandTotal);
   const currencyRef = useRef(settings?.currency || "USD");
   grandTotalRef.current = grandTotal;
@@ -70,6 +80,13 @@ export default function CheckoutPage() {
       else if (showCod) setPaymentMethod("cod");
     }
   }, [settings, showStripe, showPaypal, showCod]);
+
+  // Reset payment method if shipping becomes incomplete
+  useEffect(() => {
+    if (!isShippingComplete && paymentMethod && paymentMethod !== "stripe") {
+      setPaymentMethod("stripe");
+    }
+  }, [isShippingComplete, paymentMethod]);
 
   useEffect(() => {
     if (paymentMethod !== "paypal") {
@@ -329,21 +346,35 @@ export default function CheckoutPage() {
               </div>
 
               {/* Payment */}
-              <div className="rounded-2xl border border-border/60 bg-card/50 p-7">
+              <div className={`rounded-2xl border p-7 transition-all ${isShippingComplete ? "border-border/60 bg-card/50" : "border-border/30 bg-card/30 opacity-60"}`}>
                 <h2 className="text-base font-medium text-foreground mb-6 flex items-center gap-2.5">
-                  <div className="h-8 w-8 rounded-full bg-primary/8 flex items-center justify-center">
-                    <Lock className="h-4 w-4 text-primary" />
+                  <div className={`h-8 w-8 rounded-full flex items-center justify-center ${isShippingComplete ? "bg-primary/8" : "bg-muted"}`}>
+                    <Lock className={`h-4 w-4 ${isShippingComplete ? "text-primary" : "text-muted-foreground"}`} />
                   </div>
                   Payment Method
+                  {!isShippingComplete && (
+                    <span className="ml-auto text-xs text-muted-foreground font-normal">(Complete shipping info first)</span>
+                  )}
                 </h2>
-                <div className="grid grid-cols-2 gap-3">
+                {!isShippingComplete && (
+                  <div className="mb-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                    <p className="text-xs text-amber-400 flex items-center gap-2">
+                      <Lock className="h-3 w-3" />
+                      Please complete shipping information above to proceed with payment.
+                    </p>
+                  </div>
+                )}
+                <div className={`grid grid-cols-2 gap-3 ${!isShippingComplete ? "pointer-events-none" : ""}`}>
                   {showStripe && (
                     <button
                       type="button"
-                      onClick={() => setPaymentMethod("stripe")}
-                      className={`flex items-center justify-center gap-3 p-4 rounded-xl border transition-all ${paymentMethod === "stripe"
-                          ? "border-primary bg-primary/5"
-                          : "border-border/60 hover:border-foreground/20"
+                      onClick={() => isShippingComplete && setPaymentMethod("stripe")}
+                      disabled={!isShippingComplete}
+                      className={`flex items-center justify-center gap-3 p-4 rounded-xl border transition-all ${!isShippingComplete
+                          ? "border-border/30 bg-muted/50 opacity-50 cursor-not-allowed"
+                          : paymentMethod === "stripe"
+                            ? "border-primary bg-primary/5"
+                            : "border-border/60 hover:border-foreground/20"
                         }`}
                       data-testid="button-payment-stripe"
                     >
@@ -354,10 +385,13 @@ export default function CheckoutPage() {
                   {showPaypal && (
                     <button
                       type="button"
-                      onClick={() => setPaymentMethod("paypal")}
-                      className={`flex items-center justify-center gap-3 p-4 rounded-xl border transition-all ${paymentMethod === "paypal"
-                          ? "border-primary bg-primary/5"
-                          : "border-border/60 hover:border-foreground/20"
+                      onClick={() => isShippingComplete && setPaymentMethod("paypal")}
+                      disabled={!isShippingComplete}
+                      className={`flex items-center justify-center gap-3 p-4 rounded-xl border transition-all ${!isShippingComplete
+                          ? "border-border/30 bg-muted/50 opacity-50 cursor-not-allowed"
+                          : paymentMethod === "paypal"
+                            ? "border-primary bg-primary/5"
+                            : "border-border/60 hover:border-foreground/20"
                         }`}
                       data-testid="button-payment-paypal"
                     >
@@ -368,10 +402,13 @@ export default function CheckoutPage() {
                   {showCod && (
                     <button
                       type="button"
-                      onClick={() => setPaymentMethod("cod")}
-                      className={`flex items-center justify-center gap-3 p-4 rounded-xl border transition-all ${paymentMethod === "cod"
-                          ? "border-primary bg-primary/5"
-                          : "border-border/60 hover:border-foreground/20"
+                      onClick={() => isShippingComplete && setPaymentMethod("cod")}
+                      disabled={!isShippingComplete}
+                      className={`flex items-center justify-center gap-3 p-4 rounded-xl border transition-all ${!isShippingComplete
+                          ? "border-border/30 bg-muted/50 opacity-50 cursor-not-allowed"
+                          : paymentMethod === "cod"
+                            ? "border-primary bg-primary/5"
+                            : "border-border/60 hover:border-foreground/20"
                         }`}
                       data-testid="button-payment-cod"
                     >
@@ -380,7 +417,7 @@ export default function CheckoutPage() {
                     </button>
                   )}
                 </div>
-                {paymentMethod === "paypal" && (
+                {paymentMethod === "paypal" && isShippingComplete && (
                   <div className="mt-5 rounded-xl border border-border/60 bg-white dark:bg-zinc-900 p-5 space-y-3">
                     {!paypalConfig?.enabled || !paypalConfig?.clientId ? (
                       <p className="text-sm text-amber-600 dark:text-amber-400">
@@ -455,12 +492,18 @@ export default function CheckoutPage() {
                 </div>
                 <button
                   type="submit"
-                  disabled={isSubmitting || (paymentMethod === "paypal" && !paypalApproved)}
+                  disabled={!isShippingComplete || isSubmitting || (paymentMethod === "paypal" && !paypalApproved)}
                   className="w-full mt-7 flex items-center justify-center gap-2 rounded-full bg-foreground h-12 text-sm font-medium tracking-wide text-background transition-all hover:bg-foreground/90 disabled:opacity-50"
                   data-testid="button-place-order"
                 >
                   <Lock className="h-3.5 w-3.5" />
-                  {isSubmitting ? "Processing..." : paymentMethod === "paypal" && !paypalApproved ? "Complete PayPal First" : "Place Order"}
+                  {!isShippingComplete
+                    ? "Complete Shipping Info First"
+                    : isSubmitting
+                      ? "Processing..."
+                      : paymentMethod === "paypal" && !paypalApproved
+                        ? "Complete PayPal First"
+                        : "Place Order"}
                 </button>
                 <div className="flex items-center justify-center gap-2 mt-4 text-xs text-muted-foreground">
                   <ShieldCheck className="h-3.5 w-3.5" />
