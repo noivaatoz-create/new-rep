@@ -118,6 +118,7 @@ export default function CheckoutPage() {
 
   const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(null);
   const [stripeCreatingIntent, setStripeCreatingIntent] = useState(false);
+  const [stripeRetry, setStripeRetry] = useState(0);
 
   const [form, setForm] = useState({
     name: "",
@@ -191,7 +192,7 @@ export default function CheckoutPage() {
     return () => {
       cancelled = true;
     };
-  }, [paymentMethod, isShippingComplete, grandTotal, stripeConfig?.enabled, stripeConfig?.publishableKey, settings?.currency]);
+  }, [paymentMethod, isShippingComplete, grandTotal, stripeConfig?.enabled, stripeConfig?.publishableKey, settings?.currency, stripeRetry]);
 
   useEffect(() => {
     if (settings) {
@@ -446,7 +447,12 @@ export default function CheckoutPage() {
       return;
     }
     if (paymentMethod === "stripe") {
-      // Stripe flow is handled by StripeCheckoutForm (confirm then place order)
+      if (stripeClientSecret) return; // handled by StripeCheckoutForm
+      toast({
+        title: "Use the card form to pay",
+        description: "If you don’t see the card form, add Stripe keys in Admin → Settings → Payment and refresh.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -686,6 +692,25 @@ export default function CheckoutPage() {
                         <p className="text-xs text-center text-primary font-medium">Order is being placed automatically…</p>
                       )}
                     </div>
+                  </div>
+                ) : paymentMethod === "stripe" && isShippingComplete && (!stripeConfig?.enabled || !stripeConfig?.publishableKey) ? (
+                  <div className="mt-7 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
+                    <p className="text-sm text-amber-800 dark:text-amber-200">
+                      Stripe is not set up. Add Stripe keys in Admin → Settings → Payment and turn Stripe on.
+                    </p>
+                  </div>
+                ) : paymentMethod === "stripe" && isShippingComplete && stripeConfig?.enabled && stripeConfig?.publishableKey && !stripeClientSecret && !stripeCreatingIntent ? (
+                  <div className="mt-7 space-y-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
+                    <p className="text-sm text-amber-800 dark:text-amber-200">
+                      Payment form couldn’t load. Check Stripe keys in Admin → Settings → Payment, or try again.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setStripeRetry((r) => r + 1)}
+                      className="w-full rounded-full border border-foreground/20 bg-background py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+                    >
+                      Try again
+                    </button>
                   </div>
                 ) : paymentMethod === "stripe" && isShippingComplete && stripeConfig?.enabled && stripeConfig?.publishableKey && stripeClientSecret ? (
                   <div className="mt-7">
