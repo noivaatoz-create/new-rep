@@ -175,12 +175,15 @@ export default function CheckoutPage() {
       amount: grandTotal,
       currency: (settings?.currency || "USD").toLowerCase(),
     })
-      .then((res) => res.json())
-      .then((data) => {
+      .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
         if (!cancelled && data.clientSecret) setStripeClientSecret(data.clientSecret);
+        else if (!cancelled && !res.ok && data.error) {
+          toast({ title: "Stripe error", description: data.error, variant: "destructive" });
+        }
       })
       .catch(() => {
-        if (!cancelled) toast({ title: "Stripe error", description: "Could not start payment.", variant: "destructive" });
+        if (!cancelled) toast({ title: "Stripe error", description: "Could not start payment. Check Admin → Settings → Stripe keys.", variant: "destructive" });
       })
       .finally(() => {
         if (!cancelled) setStripeCreatingIntent(false);

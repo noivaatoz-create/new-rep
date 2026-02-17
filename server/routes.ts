@@ -536,8 +536,9 @@ export async function registerRoutes(
     for (const s of settings) {
       settingsObj[s.key] = s.value;
     }
-    const enabled = settingsObj.stripeEnabled === "true";
-    const publishableKey = settingsObj.stripePublicKey || "";
+    const publishableKey = (settingsObj.stripePublicKey || "").trim();
+    const hasSecret = Boolean((settingsObj.stripeSecretKey || "").trim());
+    const enabled = settingsObj.stripeEnabled === "true" && publishableKey && hasSecret;
     res.json({ enabled, publishableKey });
   });
 
@@ -547,7 +548,7 @@ export async function registerRoutes(
     for (const s of settings) {
       settingsObj[s.key] = s.value;
     }
-    const secretKey = settingsObj.stripeSecretKey;
+    const secretKey = (settingsObj.stripeSecretKey || "").trim();
     const stripeEnabled = settingsObj.stripeEnabled === "true";
     if (!stripeEnabled || !secretKey) {
       return res.status(400).json({ error: "Stripe is not configured or disabled" });
@@ -556,12 +557,12 @@ export async function registerRoutes(
     const { amount, currency } = req.body as { amount?: number; currency?: string };
     const amountCents = Math.round(Number(amount) * 100);
     if (!Number.isFinite(amountCents) || amountCents < 50) {
-      return res.status(400).json({ error: "Invalid amount" });
+      return res.status(400).json({ error: "Invalid amount (minimum 0.50)" });
     }
     const curr = (currency || settingsObj.currency || "usd").toString().toLowerCase().slice(0, 3);
 
     try {
-      const stripe = new Stripe(secretKey, { apiVersion: "2024-11-20.acacia" });
+      const stripe = new Stripe(secretKey);
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amountCents,
         currency: curr,
