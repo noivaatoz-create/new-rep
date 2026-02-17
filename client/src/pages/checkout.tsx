@@ -4,7 +4,7 @@ import { Link, useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useQuery } from "@tanstack/react-query";
-import { Lock, ArrowLeft, Truck, ShieldCheck, Banknote } from "lucide-react";
+import { Lock, ArrowLeft, Truck, ShieldCheck, Banknote, Package } from "lucide-react";
 import { SiStripe, SiPaypal } from "react-icons/si";
 
 declare global {
@@ -413,9 +413,12 @@ export default function CheckoutPage() {
             </div>
 
             {/* Order Summary */}
-            <div>
-              <div className="rounded-2xl border border-border/60 bg-card/50 p-7 sticky top-24">
-                <h2 className="text-base font-medium text-foreground mb-6">Order Summary</h2>
+            <div className="lg:col-span-1">
+              <div className="rounded-2xl border border-border bg-card p-7 sticky top-24 shadow-lg">
+                <h2 className="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
+                  <Package className="h-5 w-5 text-primary" />
+                  Order Summary
+                </h2>
                 <div className="space-y-4 mb-6">
                   {items.map((item) => (
                     <div key={item.id} className="flex gap-4" data-testid={`checkout-item-${item.id}`}>
@@ -430,22 +433,22 @@ export default function CheckoutPage() {
                     </div>
                   ))}
                 </div>
-                <div className="space-y-2.5 border-t border-border/60 pt-5">
+                <div className="space-y-3 border-t border-border pt-5">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Subtotal</span>
-                    <span className="text-foreground">${total.toFixed(2)}</span>
+                    <span className="text-muted-foreground font-medium">Subtotal</span>
+                    <span className="text-foreground font-semibold">${total.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Shipping</span>
-                    <span className="text-foreground">{shipping === 0 ? <span className="text-primary font-medium">Free</span> : `$${shipping.toFixed(2)}`}</span>
+                    <span className="text-muted-foreground font-medium">Shipping</span>
+                    <span className="text-foreground font-semibold">{shipping === 0 ? <span className="text-primary font-medium">Free</span> : `$${shipping.toFixed(2)}`}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Tax</span>
-                    <span className="text-foreground">${tax.toFixed(2)}</span>
+                    <span className="text-muted-foreground font-medium">Tax</span>
+                    <span className="text-foreground font-semibold">${tax.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-base font-medium pt-3 border-t border-border/60">
+                  <div className="flex justify-between text-lg font-bold pt-4 border-t-2 border-border">
                     <span className="text-foreground">Total</span>
-                    <span className="text-foreground" data-testid="text-checkout-total">${grandTotal.toFixed(2)}</span>
+                    <span className="text-primary" data-testid="text-checkout-total">${grandTotal.toFixed(2)}</span>
                   </div>
                 </div>
                 <button
