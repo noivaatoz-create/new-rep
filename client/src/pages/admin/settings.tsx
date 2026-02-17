@@ -175,6 +175,7 @@ export default function AdminSettings() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/settings"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/paypal/config"] });
       toast({ title: "Settings saved successfully" });
     },
     onError: () => {
