@@ -15,6 +15,20 @@ const app = express();
 app.set("trust proxy", 1);
 const httpServer = createServer(app);
 
+// Vercel serverless: req.url can be absolute; Express needs path-only for routing
+if (process.env.VERCEL) {
+  app.use((req, _res, next) => {
+    if (req.url && req.url.startsWith("http")) {
+      try {
+        req.url = new URL(req.url).pathname + (new URL(req.url).search || "");
+      } catch {
+        // keep as-is
+      }
+    }
+    next();
+  });
+}
+
 app.use(
   express.json({
     limit: "50mb",
@@ -81,6 +95,8 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 // Initialization promise - ensures routes are ready before handling requests
 const initPromise = (async () => {
   await registerRoutes(httpServer, app);
+
+  app.use((_req, res) => res.status(404).json({ error: "Not found" }));
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
