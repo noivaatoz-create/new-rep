@@ -210,7 +210,7 @@ export default function CheckoutPage() {
       const res = await apiRequest("POST", "/api/orders", orderData);
       const order = await res.json();
       clearCart();
-      toast({ title: "Order placed successfully", description: "Thank you for your purchase. You'll receive a confirmation email shortly." });
+      toast({ title: "Order confirmed!", description: "Check your email for the invoice. Redirecting to confirmation…" });
       navigate(`/checkout/success?order=${order.orderNumber}`);
     } catch (error) {
       toast({ title: "Error", description: "Failed to place order. Please try again.", variant: "destructive" });

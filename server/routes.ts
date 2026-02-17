@@ -15,6 +15,8 @@ import {
 } from "../shared/color-variants.js";
 import { randomUUID } from "crypto";
 import multer from "multer";
+import { sendOrderInvoice } from "./email.js";
+import { pushOrderToVeeqo } from "./veeqo.js";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -428,9 +430,36 @@ export async function registerRoutes(
     if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
     const order = await storage.createOrder(parsed.data);
 
-    // Simulate sending an email invoice
-    console.log(`[EMAIL] Sending invoice for order ${order.orderNumber} to ${order.customerEmail}`);
-    console.log(`[EMAIL] Details: ${order.items.length} items, Total: ${order.total}`);
+    // Send invoice email (non-blocking; don't fail order if email fails)
+    sendOrderInvoice({
+      orderNumber: order.orderNumber,
+      customerName: order.customerName,
+      customerEmail: order.customerEmail,
+      shippingAddress: order.shippingAddress,
+      items: order.items,
+      subtotal: String(order.subtotal),
+      shipping: String(order.shipping),
+      tax: String(order.tax),
+      total: String(order.total),
+      status: order.status,
+    }).catch((err) => console.error("[EMAIL] Invoice send failed:", err));
+
+    // Push order to Veeqo if configured (non-blocking)
+    pushOrderToVeeqo({
+      orderNumber: order.orderNumber,
+      customerName: order.customerName,
+      customerEmail: order.customerEmail,
+      shippingAddress: order.shippingAddress,
+      items: order.items,
+      paymentProvider: order.paymentProvider ?? null,
+      paymentId: order.paymentId ?? null,
+    }).then((r) => {
+      if (r.ok) {
+        if (r.veeqoOrderId) console.log("[VEEQO] Order pushed:", order.orderNumber, "→ Veeqo ID", r.veeqoOrderId);
+      } else {
+        console.warn("[VEEQO] Push failed:", order.orderNumber, r.error);
+      }
+    }).catch((err) => console.error("[VEEQO] Push error:", err));
 
     res.status(201).json(order);
   });

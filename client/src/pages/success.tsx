@@ -25,9 +25,9 @@ export default function SuccessPage() {
                 </div>
 
                 <div className="space-y-3">
-                    <h1 className="text-4xl font-serif text-foreground tracking-tight">Thank You!</h1>
+                    <h1 className="text-4xl font-serif text-foreground tracking-tight">Order confirmed!</h1>
                     <p className="text-muted-foreground text-lg">
-                        Your order has been placed successfully and is being processed.
+                        Your order has been placed successfully. Check your email for the invoice and order details.
                     </p>
                 </div>
 
@@ -41,8 +41,8 @@ export default function SuccessPage() {
                         </div>
                         <div className="space-y-3">
                             <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                                <Mail className="h-4 w-4" />
-                                <span>Confirmation sent to {order.customerEmail}</span>
+                                <Mail className="h-4 w-4 flex-shrink-0" />
+                                <span>Invoice sent to <strong className="text-foreground">{order.customerEmail}</strong></span>
                             </div>
                             <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                 <Package className="h-4 w-4" />
