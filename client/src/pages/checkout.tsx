@@ -496,9 +496,9 @@ export default function CheckoutPage() {
                     ) : (
                       <>
                         <p className="text-xs text-zinc-600 dark:text-zinc-400">Complete shipping information to proceed with PayPal payment.</p>
-                        <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2">
-                          <p className="text-xs font-medium text-amber-800 dark:text-amber-200">
-                            Card form mein text kam dikhe? Page zoom (Ctrl/Cmd +) ya PayPal login use karein.
+                        <div className="rounded-lg border-2 border-primary/60 bg-primary/20 px-4 py-3">
+                          <p className="text-sm font-semibold text-primary-foreground dark:text-primary">
+                            Having trouble reading the card form? Try zooming the page (Ctrl/Cmd +) or log in with your PayPal account.
                           </p>
                         </div>
                         <div id="paypal-button-container" data-testid="paypal-button-container" className="min-h-[44px]" />
@@ -554,9 +554,9 @@ export default function CheckoutPage() {
                 </div>
                 {paymentMethod === "paypal" && isShippingComplete && paypalConfig?.enabled && paypalConfig?.clientId ? (
                   <div className="mt-7 space-y-3">
-                    <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2">
-                      <p className="text-xs font-medium text-amber-800 dark:text-amber-200">
-                        Card form mein text kam dikhe? Page zoom karein (Ctrl/Cmd +) ya &quot;PayPal&quot; button se login karke pay karein.
+                    <div className="rounded-lg border-2 border-primary/60 bg-primary/20 px-4 py-3">
+                      <p className="text-sm font-semibold text-primary-foreground dark:text-primary">
+                        Having trouble reading the card form? Try zooming the page (Ctrl/Cmd +) or log in with your PayPal account to pay.
                       </p>
                     </div>
                     <div id="paypal-button-summary" data-testid="paypal-button-summary" className="min-h-[44px]" />
