@@ -150,6 +150,7 @@ export default function AdminDashboard() {
 
   const now = new Date();
   const filteredOrders = orders?.filter(o => {
+    if (o.status === "refunded") return false;
     if (period === "all") return true;
     if (!o.createdAt) return false;
     const date = new Date(o.createdAt);
