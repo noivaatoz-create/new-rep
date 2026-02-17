@@ -487,17 +487,18 @@ export default function CheckoutPage() {
                     </button>
                   )}
                 </div>
-                {paymentMethod === "paypal" && isShippingComplete && !paypalConfig?.enabled && (
+                {paymentMethod === "paypal" && !isShippingComplete && (
                   <div className="mt-5 rounded-xl border border-border/60 bg-white dark:bg-zinc-900 p-5 space-y-3">
-                    <p className="text-sm text-amber-600 dark:text-amber-400">
-                      PayPal is not configured. Add PayPal Client ID in Admin → Settings to enable PayPal checkout.
-                    </p>
-                  </div>
-                )}
-                {paymentMethod === "paypal" && isShippingComplete && paypalConfig?.enabled && paypalConfig?.clientId && (
-                  <div className="mt-5 rounded-xl border border-border/60 bg-white dark:bg-zinc-900 p-5 space-y-3">
-                    <p className="text-xs text-zinc-600 dark:text-zinc-400 text-center">Pay with PayPal using the button in Order Summary.</p>
-                    <div id="paypal-button-container" data-testid="paypal-button-container" className="min-h-[44px]" />
+                    {!paypalConfig?.enabled || !paypalConfig?.clientId ? (
+                      <p className="text-sm text-amber-600 dark:text-amber-400">
+                        PayPal is not configured. Add PayPal Client ID in Admin → Settings to enable PayPal checkout.
+                      </p>
+                    ) : (
+                      <>
+                        <p className="text-xs text-zinc-600 dark:text-zinc-400">Complete shipping information to proceed with PayPal payment.</p>
+                        <div id="paypal-button-container" data-testid="paypal-button-container" className="min-h-[44px]" />
+                      </>
+                    )}
                   </div>
                 )}
                 <p className="text-muted-foreground text-xs mt-5 flex items-center gap-1.5">
