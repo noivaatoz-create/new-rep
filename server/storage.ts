@@ -13,8 +13,9 @@ import {
 
 const supabaseUrl = process.env.SUPABASE_URL?.trim();
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY?.trim();
+const looksLikePlaceholder = (s: string) => /\[.*\]|your-|change-this|\.example\.com/i.test(s);
 const supabase: SupabaseClient | null =
-  supabaseUrl && supabaseServiceKey
+  supabaseUrl && supabaseServiceKey && !looksLikePlaceholder(supabaseUrl) && !looksLikePlaceholder(supabaseServiceKey)
     ? createClient(supabaseUrl, supabaseServiceKey, {
         auth: { persistSession: false, autoRefreshToken: false },
       })
