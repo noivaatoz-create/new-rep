@@ -65,6 +65,8 @@ export default function CheckoutPage() {
   grandTotalRef.current = grandTotal;
   currencyRef.current = settings?.currency || "USD";
 
+  const placeOrderAfterPayPalRef = useRef<(paymentId: string) => void>(() => {});
+
   const stripeEnabled = settings?.stripeEnabled === "true";
   const paypalEnabled = settings?.paypalEnabled === "true" || paypalConfig?.enabled === true;
   const codEnabled = settings?.codEnabled === "true";
@@ -87,6 +89,43 @@ export default function CheckoutPage() {
       setPaymentMethod("stripe");
     }
   }, [isShippingComplete, paymentMethod]);
+
+  useEffect(() => {
+    placeOrderAfterPayPalRef.current = async (paymentId: string) => {
+      if (items.length === 0) return;
+      setIsSubmitting(true);
+      try {
+        const orderData = {
+          customerName: form.name,
+          customerEmail: form.email,
+          shippingAddress: `${form.address}, ${form.city}, ${form.state} ${form.zip}, ${form.country}`,
+          items: items.map((item) => ({
+            productId: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image: item.image,
+          })),
+          subtotal: total.toFixed(2),
+          shipping: shipping.toFixed(2),
+          tax: tax.toFixed(2),
+          total: grandTotal.toFixed(2),
+          paymentProvider: "paypal",
+          paymentId,
+          status: "paid",
+        };
+        const res = await apiRequest("POST", "/api/orders", orderData);
+        const order = await res.json();
+        clearCart();
+        toast({ title: "Order confirmed!", description: "Check your email for the invoice. Redirecting…" });
+        navigate(`/checkout/success?order=${order.orderNumber}`);
+      } catch {
+        toast({ title: "Error", description: "Failed to place order. Please try again.", variant: "destructive" });
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+  }, [form, items, total, shipping, tax, grandTotal, clearCart, navigate, toast]);
 
   useEffect(() => {
     if (paymentMethod !== "paypal") {
@@ -163,12 +202,11 @@ export default function CheckoutPage() {
                 orderId: data.orderID,
               });
               const capture = await response.json();
-              setPaypalOrderId(capture.id || data.orderID);
+              const paymentId = capture.id || data.orderID;
+              setPaypalOrderId(paymentId);
               setPaypalApproved(true);
-              toast({
-                title: "Payment approved",
-                description: "Your PayPal payment has been confirmed. Place your order to complete.",
-              });
+              toast({ title: "Payment approved", description: "Placing your order…" });
+              placeOrderAfterPayPalRef.current(paymentId);
             } catch {
               toast({
                 title: "Payment capture failed",
