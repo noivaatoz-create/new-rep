@@ -19,20 +19,28 @@ function HeroSection() {
     queryKey: ["/api/products"],
     staleTime: 60_000,
   });
-  const heroProducts = products?.filter((p) => p.isFeatured).length
-    ? products!.filter((p) => p.isFeatured)
-    : products?.length
-      ? products!.slice(0, 4)
-      : [];
-  const current =
-    heroProducts.length > 0 && heroProducts[heroIndex]
-      ? {
-          name: heroProducts[heroIndex].name,
-          slug: heroProducts[heroIndex].slug,
-          image: heroProducts[heroIndex].image,
-          badge: heroProducts[heroIndex].badge || "Featured",
-        }
-      : HERO_FALLBACK;
+  // Hero toggle: featured pehle, phir baki; 1 product ho to fallback add karke bhi toggle dikhao
+  const featured = products?.filter((p) => p.isFeatured) ?? [];
+  const rest = products?.filter((p) => !p.isFeatured) ?? [];
+  const heroProducts = (featured.length || rest.length)
+    ? [...featured, ...rest].slice(0, 4)
+    : [];
+  const heroList =
+    heroProducts.length >= 2
+      ? heroProducts
+      : heroProducts.length === 1
+        ? [heroProducts[0], HERO_FALLBACK as { name: string; slug: string; image: string; badge: string }]
+        : [HERO_FALLBACK];
+  const displayIndex = Math.min(heroIndex, heroList.length - 1);
+  const currentItem = heroList[displayIndex];
+  const current = currentItem
+    ? {
+        name: currentItem.name,
+        slug: currentItem.slug,
+        image: currentItem.image,
+        badge: (currentItem as Product).badge || (currentItem as typeof HERO_FALLBACK).badge || "Featured",
+      }
+    : HERO_FALLBACK;
 
   return (
     <section className="relative overflow-hidden py-24 sm:py-36 lg:py-44" data-testid="section-hero">
@@ -106,16 +114,16 @@ function HeroSection() {
                   </div>
                 </div>
                 {/* Toggle: jo ON ho us product hero mein dikhe */}
-                {heroProducts.length > 1 && (
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-                    {heroProducts.map((_, i) => (
+                {heroList.length > 1 && (
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-2 z-20 px-3 py-2 rounded-full bg-black/40 backdrop-blur-sm">
+                    {heroList.map((item, i) => (
                       <button
                         key={i}
                         type="button"
-                        aria-label={`Show ${heroProducts[i].name}`}
+                        aria-label={`Show ${item.name}`}
                         onClick={() => setHeroIndex(i)}
                         className={`h-2.5 rounded-full transition-all duration-200 ${
-                          i === heroIndex
+                          i === displayIndex
                             ? "w-8 bg-white"
                             : "w-2.5 bg-white/50 hover:bg-white/70"
                         }`}
