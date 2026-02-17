@@ -6,7 +6,7 @@ A modern travel application built with React, Express, and PostgreSQL.
 
 ### Prerequisites
 - Node.js 20+
-- Supabase account
+- Neon (or any PostgreSQL) for database
 - Vercel account
 
 ## 📦 Setup Instructions
@@ -17,29 +17,27 @@ A modern travel application built with React, Express, and PostgreSQL.
 npm install
 ```
 
-### 2. Set Up Supabase Database
+### 2. Set Up Database (Neon)
 
-1. Go to [Supabase](https://supabase.com) and create a new project
-2. Wait for the database to be provisioned
-3. Go to **Project Settings** → **Database**
-4. Copy the **Connection String** (URI format)
-5. Create a `.env` file in the project root:
+1. Go to [Neon](https://neon.tech) and create a new project
+2. Copy the **Connection string** (URI format)
+3. Create a `.env` file in the project root:
 
 ```bash
 cp .env.example .env
 ```
 
-6. Update the `.env` file with your Supabase credentials:
+4. Update the `.env` file:
 
 ```env
-DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres
+DATABASE_URL=postgresql://user:password@ep-xxx.region.aws.neon.tech/neondb?sslmode=require
 SESSION_SECRET=your-random-secret-key
 NODE_ENV=development
 ```
 
 ### 3. Run Database Migrations
 
-Push the database schema to Supabase:
+Push the database schema:
 
 ```bash
 npm run db:push
@@ -76,7 +74,7 @@ vercel
    - Go to your project settings
    - Navigate to **Environment Variables**
    - Add:
-     - `DATABASE_URL` - Your Supabase connection string
+     - `DATABASE_URL` - Your Neon (or PostgreSQL) connection string
      - `SESSION_SECRET` - A random secret key
      - `NODE_ENV` - Set to `production`
 
@@ -96,7 +94,7 @@ vercel
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `DATABASE_URL` | Supabase PostgreSQL connection string | ✅ Yes |
+| `DATABASE_URL` | Neon / PostgreSQL connection string | ✅ Yes |
 | `SESSION_SECRET` | Secret key for session encryption | ✅ Yes |
 | `NODE_ENV` | Environment (development/production) | ✅ Yes |
 | `ADMIN_USERNAME` | Admin username for initial setup | ❌ Optional |
@@ -108,7 +106,7 @@ vercel
 - `npm run build` - Build for production
 - `npm start` - Start production server
 - `npm run check` - Type check with TypeScript
-- `npm run db:push` - Push database schema to Supabase
+- `npm run db:push` - Push database schema to your database
 
 ## 🗄️ Database Schema
 
@@ -123,13 +121,13 @@ To modify the schema:
 - Never commit `.env` files to version control
 - Use strong, random values for `SESSION_SECRET`
 - Rotate secrets regularly in production
-- Enable Row Level Security (RLS) in Supabase for production
+- Use strong database credentials and restrict access in production
 
 ## 📚 Tech Stack
 
 - **Frontend**: React, TypeScript, TailwindCSS
 - **Backend**: Express, Node.js
-- **Database**: PostgreSQL (Supabase)
+- **Database**: PostgreSQL (Neon or any Postgres)
 - **ORM**: Drizzle
 - **Deployment**: Vercel
 - **Authentication**: Passport.js with sessions
@@ -138,7 +136,7 @@ To modify the schema:
 
 ### Database Connection Issues
 - Verify your `DATABASE_URL` is correct
-- Check if your IP is allowed in Supabase (Settings → Database → Connection Pooling)
+- For Neon: check connection string and SSL (sslmode=require)
 - Ensure the database is active
 
 ### Build Failures

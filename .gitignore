@@ -13,5 +13,6 @@ vite.config.ts.*
 # Vercel
 .vercel
 
-# Local Uploads
+# Local Uploads (fallback when Supabase not configured)
+uploads
 client/public/uploads

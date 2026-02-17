@@ -68,7 +68,7 @@ export default function AdminProducts() {
       onSuccess(data.url);
     } catch (err: any) {
       clearTimeout(timeoutId);
-      const msg = "Could not upload image. Try again.";
+      const msg = err instanceof Error ? err.message : "Could not upload image. Try again.";
       toast({ title: "Upload Failed", description: msg, variant: "destructive" });
     }
   };

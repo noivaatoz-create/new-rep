@@ -1,12 +1,13 @@
-import { createClient } from "@supabase/supabase-js";
 import cookieSession from "cookie-session";
 import express from "express";
 import multer from "multer";
 import path from "path";
 import { randomUUID } from "crypto";
+import fs from "fs";
 
 const app = express();
 app.set("trust proxy", 1);
+app.use(express.json());
 app.use(
   cookieSession({
     name: "session",
@@ -38,32 +39,27 @@ app.post("/api/upload", requireAdmin, upload.single("image"), async (req: any, r
   try {
     if (!req.file) return res.status(400).json({ error: "No image file provided" });
 
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
-    if (!supabaseUrl || !supabaseKey) {
+    // On Vercel serverless there is no persistent disk; use local uploads folder when available
+    const uploadsDir = path.join(process.cwd(), "uploads");
+    const canWrite = !process.env.VERCEL && (() => {
+      try {
+        if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+        return true;
+      } catch {
+        return false;
+      }
+    })();
+
+    if (!canWrite) {
       return res.status(503).json({
-        error: "Upload not configured. Set SUPABASE_URL and SUPABASE_SERVICE_KEY.",
+        error: "Image upload on Vercel is not configured. Use local deploy for uploads or add Vercel Blob.",
       });
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
     const ext = path.extname(req.file.originalname);
     const name = `${Date.now()}-${randomUUID().slice(0, 8)}${ext}`;
-
-    const { error } = await supabase.storage
-      .from("uploads")
-      .upload(name, req.file.buffer, {
-        contentType: req.file.mimetype,
-        upsert: false,
-      });
-
-    if (error) {
-      console.error("Supabase upload error:", error);
-      return res.status(500).json({ error: "Upload failed" });
-    }
-
-    const { data: urlData } = supabase.storage.from("uploads").getPublicUrl(name);
-    return res.json({ url: urlData.publicUrl });
+    fs.writeFileSync(path.join(uploadsDir, name), req.file.buffer);
+    return res.json({ url: `/uploads/${name}` });
   } catch (err) {
     console.error("Upload error:", err);
     res.status(500).json({ error: "Upload failed" });

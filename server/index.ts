@@ -1,4 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
+import path from "path";
 import cookieSession from "cookie-session";
 import { registerRoutes } from "./routes.js";
 import { serveStatic } from "./static.js";
@@ -73,6 +74,9 @@ app.use((req, res, next) => {
 
   next();
 });
+
+// Local image uploads
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Initialization promise - ensures routes are ready before handling requests
 const initPromise = (async () => {
