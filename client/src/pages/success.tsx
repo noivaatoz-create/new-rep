@@ -1,15 +1,50 @@
+import { useEffect, useState } from "react";
 import { Link, useSearch } from "wouter";
 import { CheckCircle2, Package, ArrowRight, ShoppingBag, Mail } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import type { Order } from "@shared/schema";
+import { apiRequest } from "@/lib/queryClient";
+import { useCartStore } from "@/lib/cart-store";
+
+const PENDING_STRIPE_ORDER_KEY = "pendingStripeOrder";
 
 export default function SuccessPage() {
     const search = useSearch();
-    const orderNumber = new URLSearchParams(search).get("order");
+    const params = new URLSearchParams(search);
+    const orderNumber = params.get("order");
+    const stripeReturn = params.get("stripe") === "1";
+    const paymentIntent = params.get("payment_intent");
+    const clearCart = useCartStore((s) => s.clearCart);
+
+    const [stripeOrderNumber, setStripeOrderNumber] = useState<string | null>(null);
+    const [stripeError, setStripeError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!stripeReturn || !paymentIntent) return;
+        const raw = sessionStorage.getItem(PENDING_STRIPE_ORDER_KEY);
+        if (!raw) return;
+        try {
+            const payload = JSON.parse(raw);
+            payload.paymentId = paymentIntent;
+            apiRequest("POST", "/api/orders", payload)
+                .then((res) => res.json())
+                .then((order) => {
+                    setStripeOrderNumber(order.orderNumber);
+                    sessionStorage.removeItem(PENDING_STRIPE_ORDER_KEY);
+                    clearCart();
+                    window.history.replaceState({}, "", `/checkout/success?order=${order.orderNumber}`);
+                })
+                .catch(() => setStripeError("Failed to create order"));
+        } catch {
+            setStripeError("Invalid session data");
+        }
+    }, [stripeReturn, paymentIntent, clearCart]);
+
+    const displayOrderNumber = orderNumber || stripeOrderNumber;
 
     const { data: order } = useQuery<Order>({
-        queryKey: [`/api/track/${orderNumber}`],
-        enabled: !!orderNumber,
+        queryKey: [`/api/track/${displayOrderNumber}`],
+        enabled: !!displayOrderNumber,
     });
 
     return (
@@ -25,9 +60,13 @@ export default function SuccessPage() {
                 </div>
 
                 <div className="space-y-3">
-                    <h1 className="text-4xl font-serif text-foreground tracking-tight">Order confirmed!</h1>
+                    <h1 className="text-4xl font-serif text-foreground tracking-tight">
+                        {stripeError ? "Something went wrong" : "Order confirmed!"}
+                    </h1>
                     <p className="text-muted-foreground text-lg">
-                        Your order has been placed successfully. Check your email for the invoice and order details.
+                        {stripeError
+                            ? stripeError
+                            : "Your order has been placed successfully. Check your email for the invoice and order details."}
                     </p>
                 </div>
 
@@ -59,7 +98,7 @@ export default function SuccessPage() {
                             Continue Shopping
                         </button>
                     </Link>
-                    <Link href={order ? `/track-order?order=${order.orderNumber}` : "/track-order"}>
+                    <Link href={order ? `/track-order?order=${encodeURIComponent(order.orderNumber)}` : "/track-order"}>
                         <button className="w-full flex items-center justify-center gap-2 rounded-full bg-foreground h-12 text-sm font-medium tracking-wide text-background transition-all hover:bg-foreground/90">
                             Track Order
                             <ArrowRight className="h-4 w-4" />

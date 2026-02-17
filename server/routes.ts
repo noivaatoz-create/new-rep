@@ -17,6 +17,7 @@ import { randomUUID } from "crypto";
 import multer from "multer";
 import { sendOrderInvoice } from "./email.js";
 import { pushOrderToVeeqo } from "./veeqo.js";
+import Stripe from "stripe";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -527,6 +528,50 @@ export async function registerRoutes(
       settingsObj[s.key] = s.value;
     }
     res.json(settingsObj);
+  });
+
+  app.get("/api/stripe/config", async (_req, res) => {
+    const settings = await storage.getSettings();
+    const settingsObj: Record<string, string> = {};
+    for (const s of settings) {
+      settingsObj[s.key] = s.value;
+    }
+    const enabled = settingsObj.stripeEnabled === "true";
+    const publishableKey = settingsObj.stripePublicKey || "";
+    res.json({ enabled, publishableKey });
+  });
+
+  app.post("/api/stripe/create-payment-intent", async (req, res) => {
+    const settings = await storage.getSettings();
+    const settingsObj: Record<string, string> = {};
+    for (const s of settings) {
+      settingsObj[s.key] = s.value;
+    }
+    const secretKey = settingsObj.stripeSecretKey;
+    const stripeEnabled = settingsObj.stripeEnabled === "true";
+    if (!stripeEnabled || !secretKey) {
+      return res.status(400).json({ error: "Stripe is not configured or disabled" });
+    }
+
+    const { amount, currency } = req.body as { amount?: number; currency?: string };
+    const amountCents = Math.round(Number(amount) * 100);
+    if (!Number.isFinite(amountCents) || amountCents < 50) {
+      return res.status(400).json({ error: "Invalid amount" });
+    }
+    const curr = (currency || settingsObj.currency || "usd").toString().toLowerCase().slice(0, 3);
+
+    try {
+      const stripe = new Stripe(secretKey, { apiVersion: "2024-11-20.acacia" });
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amountCents,
+        currency: curr,
+        automatic_payment_methods: { enabled: true },
+      });
+      res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (err: any) {
+      console.error("[Stripe] create-payment-intent error:", err);
+      res.status(500).json({ error: err?.message || "Failed to create payment intent" });
+    }
   });
 
   app.patch("/api/settings", requireAdmin, async (req, res) => {

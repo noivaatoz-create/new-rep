@@ -6,6 +6,8 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useQuery } from "@tanstack/react-query";
 import { Lock, ArrowLeft, Truck, ShieldCheck, Banknote, Package } from "lucide-react";
 import { SiStripe, SiPaypal } from "react-icons/si";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
 declare global {
   interface Window {
@@ -17,6 +19,87 @@ interface PayPalConfig {
   enabled: boolean;
   clientId: string;
   mode: "sandbox" | "live";
+}
+
+interface StripeConfig {
+  enabled: boolean;
+  publishableKey: string;
+}
+
+const PENDING_STRIPE_ORDER_KEY = "pendingStripeOrder";
+
+function StripeCheckoutForm({
+  orderData,
+  clientSecret,
+  onSuccess,
+  onError,
+  isSubmitting,
+  setIsSubmitting,
+  placeOrder,
+}: {
+  orderData: Record<string, unknown>;
+  clientSecret: string;
+  onSuccess: (orderNumber: string) => void;
+  onError: (message: string) => void;
+  isSubmitting: boolean;
+  setIsSubmitting: (v: boolean) => void;
+  placeOrder: (paymentId: string) => Promise<void>;
+}) {
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const handleStripeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+    setIsSubmitting(true);
+    const payload = { ...orderData, paymentProvider: "stripe", paymentId: null as string | null, status: "paid" as const };
+    sessionStorage.setItem(PENDING_STRIPE_ORDER_KEY, JSON.stringify(payload));
+    try {
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/checkout/success?stripe=1`,
+          payment_method_data: {
+            billing_details: {
+              name: orderData.customerName as string,
+              email: orderData.customerEmail as string,
+              address: { line1: orderData.shippingAddress as string },
+            },
+          },
+        },
+      });
+      if (error) {
+        onError(error.message || "Payment failed");
+        return;
+      }
+      // No redirect (e.g. card without 3DS): place order in-page
+      const paymentIntentId = clientSecret.split("_secret_")[0];
+      if (paymentIntentId) {
+        await placeOrder(paymentIntentId);
+      }
+    } catch (err: any) {
+      onError(err?.message || "Payment failed");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleStripeSubmit} className="mt-7 space-y-4">
+      <div className="rounded-xl border border-border bg-white p-5">
+        <PaymentElement options={{ layout: "tabs" }} />
+      </div>
+      <button
+        type="submit"
+        disabled={!stripe || isSubmitting}
+        className="w-full flex items-center justify-center gap-2 rounded-full bg-foreground h-12 text-sm font-medium tracking-wide text-background transition-all hover:bg-foreground/90 disabled:opacity-50"
+        data-testid="button-place-order-stripe"
+      >
+        <Lock className="h-3.5 w-3.5" />
+        {isSubmitting ? "Processing…" : "Pay & Place Order"}
+      </button>
+    </form>
+  );
 }
 
 export default function CheckoutPage() {
@@ -31,6 +114,10 @@ export default function CheckoutPage() {
 
   const { data: settings } = useQuery<Record<string, string>>({ queryKey: ["/api/settings"] });
   const { data: paypalConfig } = useQuery<PayPalConfig>({ queryKey: ["/api/paypal/config"] });
+  const { data: stripeConfig } = useQuery<StripeConfig>({ queryKey: ["/api/stripe/config"] });
+
+  const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(null);
+  const [stripeCreatingIntent, setStripeCreatingIntent] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -67,13 +154,41 @@ export default function CheckoutPage() {
 
   const placeOrderAfterPayPalRef = useRef<(paymentId: string) => void>(() => {});
 
-  const stripeEnabled = settings?.stripeEnabled === "true";
+  const stripeEnabled = settings?.stripeEnabled === "true" || stripeConfig?.enabled === true;
   const paypalEnabled = settings?.paypalEnabled === "true" || paypalConfig?.enabled === true;
   const codEnabled = settings?.codEnabled === "true";
   const noMethodsConfigured = !stripeEnabled && !paypalEnabled && !codEnabled;
   const showStripe = noMethodsConfigured || stripeEnabled;
   const showPaypal = noMethodsConfigured || paypalEnabled;
   const showCod = codEnabled;
+
+  // Create Stripe Payment Intent when Stripe is selected and shipping complete
+  useEffect(() => {
+    if (paymentMethod !== "stripe" || !isShippingComplete || !stripeConfig?.enabled || !stripeConfig?.publishableKey) {
+      setStripeClientSecret(null);
+      return;
+    }
+    let cancelled = false;
+    setStripeCreatingIntent(true);
+    setStripeClientSecret(null);
+    apiRequest("POST", "/api/stripe/create-payment-intent", {
+      amount: grandTotal,
+      currency: (settings?.currency || "USD").toLowerCase(),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled && data.clientSecret) setStripeClientSecret(data.clientSecret);
+      })
+      .catch(() => {
+        if (!cancelled) toast({ title: "Stripe error", description: "Could not start payment.", variant: "destructive" });
+      })
+      .finally(() => {
+        if (!cancelled) setStripeCreatingIntent(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [paymentMethod, isShippingComplete, grandTotal, stripeConfig?.enabled, stripeConfig?.publishableKey, settings?.currency]);
 
   useEffect(() => {
     if (settings) {
@@ -296,6 +411,26 @@ export default function CheckoutPage() {
     };
   }, [paymentMethod, showPaypal, paypalConfig?.enabled, paypalConfig?.clientId, isShippingComplete]);
 
+  const buildOrderData = (paymentId: string | null, provider: "stripe" | "paypal" | "cod", status: string) => ({
+    customerName: form.name,
+    customerEmail: form.email,
+    shippingAddress: `${form.address}, ${form.city}, ${form.state} ${form.zip}, ${form.country}`,
+    items: items.map((item) => ({
+      productId: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      image: item.image,
+    })),
+    subtotal: total.toFixed(2),
+    shipping: shipping.toFixed(2),
+    tax: tax.toFixed(2),
+    total: grandTotal.toFixed(2),
+    paymentProvider: provider,
+    paymentId,
+    status,
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (items.length === 0) return;
@@ -307,28 +442,18 @@ export default function CheckoutPage() {
       });
       return;
     }
+    if (paymentMethod === "stripe") {
+      // Stripe flow is handled by StripeCheckoutForm (confirm then place order)
+      return;
+    }
 
     setIsSubmitting(true);
     try {
-      const orderData = {
-        customerName: form.name,
-        customerEmail: form.email,
-        shippingAddress: `${form.address}, ${form.city}, ${form.state} ${form.zip}, ${form.country}`,
-        items: items.map((item) => ({
-          productId: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          image: item.image,
-        })),
-        subtotal: total.toFixed(2),
-        shipping: shipping.toFixed(2),
-        tax: tax.toFixed(2),
-        total: grandTotal.toFixed(2),
-        paymentProvider: paymentMethod,
-        paymentId: paymentMethod === "paypal" ? paypalOrderId : null,
-        status: paymentMethod === "paypal" ? "paid" : "pending",
-      };
+      const orderData = buildOrderData(
+        paymentMethod === "paypal" ? paypalOrderId : null,
+        paymentMethod,
+        paymentMethod === "paypal" ? "paid" : "pending"
+      );
 
       const res = await apiRequest("POST", "/api/orders", orderData);
       const order = await res.json();
@@ -559,10 +684,42 @@ export default function CheckoutPage() {
                       )}
                     </div>
                   </div>
+                ) : paymentMethod === "stripe" && isShippingComplete && stripeConfig?.enabled && stripeConfig?.publishableKey && stripeClientSecret ? (
+                  <div className="mt-7">
+                    <Elements
+                      stripe={loadStripe(stripeConfig.publishableKey)}
+                      options={{ clientSecret: stripeClientSecret, appearance: { theme: "stripe" } }}
+                    >
+                      <StripeCheckoutForm
+                        orderData={buildOrderData(null, "stripe", "paid")}
+                        clientSecret={stripeClientSecret}
+                        onSuccess={(orderNumber) => {
+                          clearCart();
+                          navigate(`/checkout/success?order=${orderNumber}`);
+                        }}
+                        onError={(msg) => toast({ title: "Payment failed", description: msg, variant: "destructive" })}
+                        isSubmitting={isSubmitting}
+                        setIsSubmitting={setIsSubmitting}
+                        placeOrder={async (paymentId) => {
+                          const orderDataToSend = buildOrderData(paymentId, "stripe", "paid");
+                          const res = await apiRequest("POST", "/api/orders", orderDataToSend);
+                          const order = await res.json();
+                          clearCart();
+                          toast({ title: "Order confirmed!", description: "Redirecting…" });
+                          navigate(`/checkout/success?order=${order.orderNumber}`);
+                        }}
+                      />
+                    </Elements>
+                  </div>
                 ) : (
                   <button
                     type="submit"
-                    disabled={!isShippingComplete || isSubmitting || (paymentMethod === "paypal" && !paypalApproved)}
+                    disabled={
+                      !isShippingComplete ||
+                      isSubmitting ||
+                      (paymentMethod === "paypal" && !paypalApproved) ||
+                      (paymentMethod === "stripe" && stripeCreatingIntent)
+                    }
                     className="w-full mt-7 flex items-center justify-center gap-2 rounded-full bg-foreground h-12 text-sm font-medium tracking-wide text-background transition-all hover:bg-foreground/90 disabled:opacity-50"
                     data-testid="button-place-order"
                   >
@@ -573,7 +730,9 @@ export default function CheckoutPage() {
                         ? "Processing..."
                         : paymentMethod === "paypal" && !paypalApproved
                           ? "Complete PayPal First"
-                          : "Place Order"}
+                          : paymentMethod === "stripe" && stripeCreatingIntent
+                            ? "Loading payment…"
+                            : "Place Order"}
                   </button>
                 )}
                 <div className="flex items-center justify-center gap-2 mt-4 text-xs text-muted-foreground">
