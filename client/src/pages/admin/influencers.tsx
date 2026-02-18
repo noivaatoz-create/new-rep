@@ -212,6 +212,17 @@ export default function AdminInfluencers() {
     onError: (err: any) => toast({ title: "Failed", description: err?.message || "Could not create promo code", variant: "destructive" }),
   });
 
+  const deletePromoCode = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/admin/promo-codes/${id}`);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/admin/promo-codes"] });
+      toast({ title: "Promo code deleted" });
+    },
+    onError: (err: any) => toast({ title: "Failed", description: err?.message || "Could not delete promo code", variant: "destructive" }),
+  });
+
   const markCommissionPaid = useMutation({
     mutationFn: async (id: number) => {
       await apiRequest("POST", "/api/admin/commissions/pay", { id });
@@ -348,6 +359,7 @@ export default function AdminInfluencers() {
                       <th className="py-2">Discount</th>
                       <th className="py-2">Usage</th>
                       <th className="py-2">Status</th>
+                      <th className="py-2">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -358,6 +370,20 @@ export default function AdminInfluencers() {
                         <td className="py-2">{p.discountType === "percentage" ? `${p.discountValue}%` : `$${p.discountValue}`}</td>
                         <td className="py-2">{p.usageCount}{p.usageLimit ? ` / ${p.usageLimit}` : ""}</td>
                         <td className="py-2"><StatusBadge active={p.active} /></td>
+                        <td className="py-2">
+                          <button
+                            type="button"
+                            disabled={deletePromoCode.isPending}
+                            onClick={() => {
+                              const ok = window.confirm(`Delete promo code ${p.code}?`);
+                              if (!ok) return;
+                              deletePromoCode.mutate(p.id);
+                            }}
+                            className="rounded-md border border-red-400/40 px-2.5 py-1 text-xs text-red-500 hover:bg-red-500/10 disabled:opacity-40"
+                          >
+                            Delete
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

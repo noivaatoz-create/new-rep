@@ -818,6 +818,14 @@ export async function registerRoutes(
     res.json(updated);
   });
 
+  app.delete("/api/admin/promo-codes/:id", requireAdmin, async (req, res) => {
+    const id = Number.parseInt(req.params.id, 10);
+    if (!Number.isFinite(id)) return res.status(400).json({ error: "Invalid promo code id" });
+    const [deleted] = await db.delete(promoCodes).where(eq(promoCodes.id, id)).returning({ id: promoCodes.id });
+    if (!deleted) return res.status(404).json({ error: "Promo code not found" });
+    return res.status(204).send();
+  });
+
   app.get("/api/admin/commissions", requireAdmin, async (req, res) => {
     const status = typeof req.query.status === "string" ? req.query.status : undefined;
     const where = status ? and(eq(commissions.status, status as any)) : undefined;
