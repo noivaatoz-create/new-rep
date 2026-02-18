@@ -7,10 +7,14 @@ import { Eye, Package, Truck } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
+type AdminOrder = Order & { trackingNote?: string };
+
 export default function AdminOrders() {
-  const { data: orders, isLoading } = useQuery<Order[]>({ queryKey: ["/api/orders"] });
+  const { data: orders, isLoading } = useQuery<AdminOrder[]>({ queryKey: ["/api/orders"] });
   const { toast } = useToast();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [trackingDraft, setTrackingDraft] = useState<Record<number, string>>({});
+  const [trackingNoteDraft, setTrackingNoteDraft] = useState<Record<number, string>>({});
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
@@ -32,6 +36,42 @@ export default function AdminOrders() {
 
   const statusOptions = ["pending", "paid", "packed", "shipped", "delivered", "refunded"];
 
+  const updateTrackingMutation = useMutation({
+    mutationFn: async ({ id, trackingNumber }: { id: number; trackingNumber: string }) => {
+      const res = await apiRequest("PATCH", `/api/orders/${id}`, { trackingNumber });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error || `HTTP ${res.status}`);
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+      toast({ title: "Tracking ID Updated", description: "Tracking ID saved." });
+    },
+    onError: (err: Error) => {
+      toast({ title: "Update failed", description: err.message, variant: "destructive" });
+    },
+  });
+
+  const updateTrackingNoteMutation = useMutation({
+    mutationFn: async ({ id, trackingNote }: { id: number; trackingNote: string }) => {
+      const res = await apiRequest("PATCH", `/api/orders/${id}/tracking-note`, { trackingNote });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error || `HTTP ${res.status}`);
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+      toast({ title: "Tracking update saved", description: "Customer can now see latest location/status note." });
+    },
+    onError: (err: Error) => {
+      toast({ title: "Update failed", description: err.message, variant: "destructive" });
+    },
+  });
+
   return (
     <div className="flex h-screen w-full bg-section-alt overflow-hidden">
       <AdminSidebar active="/admin/orders" />
@@ -52,6 +92,8 @@ export default function AdminOrders() {
                     <th className="p-4 text-muted-foreground text-xs font-medium uppercase tracking-wider">Items</th>
                     <th className="p-4 text-muted-foreground text-xs font-medium uppercase tracking-wider">Total</th>
                     <th className="p-4 text-muted-foreground text-xs font-medium uppercase tracking-wider">Payment</th>
+                    <th className="p-4 text-muted-foreground text-xs font-medium uppercase tracking-wider">Tracking ID</th>
+                    <th className="p-4 text-muted-foreground text-xs font-medium uppercase tracking-wider">Tracking Update</th>
                     <th className="p-4 text-muted-foreground text-xs font-medium uppercase tracking-wider">Status</th>
                     <th className="p-4 text-muted-foreground text-xs font-medium uppercase tracking-wider">Date</th>
                     <th className="p-4 text-muted-foreground text-xs font-medium uppercase tracking-wider">Actions</th>
@@ -73,6 +115,56 @@ export default function AdminOrders() {
                         <td className="p-4 text-foreground text-sm font-medium">${order.total}</td>
                         <td className="p-4">
                           <span className="text-muted-foreground text-xs uppercase">{order.paymentProvider || "N/A"}</span>
+                        </td>
+                        <td className="p-4 min-w-[250px]">
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={trackingDraft[order.id] ?? order.trackingNumber ?? ""}
+                              onChange={(e) => setTrackingDraft((prev) => ({ ...prev, [order.id]: e.target.value }))}
+                              placeholder="TRK-..."
+                              className="w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-xs text-foreground placeholder:text-muted-foreground"
+                              data-testid={`input-tracking-${order.id}`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateTrackingMutation.mutate({
+                                  id: order.id,
+                                  trackingNumber: (trackingDraft[order.id] ?? order.trackingNumber ?? "").trim(),
+                                })
+                              }
+                              className="rounded-md border border-border px-2 py-1 text-xs text-foreground hover:bg-muted"
+                              data-testid={`button-save-tracking-${order.id}`}
+                            >
+                              Save
+                            </button>
+                          </div>
+                        </td>
+                        <td className="p-4 min-w-[280px]">
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={trackingNoteDraft[order.id] ?? order.trackingNote ?? ""}
+                              onChange={(e) => setTrackingNoteDraft((prev) => ({ ...prev, [order.id]: e.target.value }))}
+                              placeholder="e.g. Reached Mumbai sorting hub"
+                              className="w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-xs text-foreground placeholder:text-muted-foreground"
+                              data-testid={`input-tracking-note-${order.id}`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateTrackingNoteMutation.mutate({
+                                  id: order.id,
+                                  trackingNote: (trackingNoteDraft[order.id] ?? order.trackingNote ?? "").trim(),
+                                })
+                              }
+                              className="rounded-md border border-border px-2 py-1 text-xs text-foreground hover:bg-muted"
+                              data-testid={`button-save-tracking-note-${order.id}`}
+                            >
+                              Save
+                            </button>
+                          </div>
                         </td>
                         <td className="p-4">
                           <select
@@ -110,7 +202,7 @@ export default function AdminOrders() {
                   })}
                   {(!orders || orders.length === 0) && (
                     <tr>
-                      <td colSpan={8} className="py-12 text-center">
+                      <td colSpan={10} className="py-12 text-center">
                         <Package className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
                         <p className="text-muted-foreground">No orders yet</p>
                       </td>
@@ -138,6 +230,54 @@ export default function AdminOrders() {
                   <div>
                     <p className="text-muted-foreground text-xs mb-1">Shipping Address</p>
                     <p className="text-foreground text-sm">{selectedOrder.shippingAddress}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-2">
+                  <p className="text-muted-foreground text-xs">Tracking ID</p>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={trackingDraft[selectedOrder.id] ?? selectedOrder.trackingNumber ?? ""}
+                      onChange={(e) => setTrackingDraft((prev) => ({ ...prev, [selectedOrder.id]: e.target.value }))}
+                      placeholder="TRK-..."
+                      className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateTrackingMutation.mutate({
+                          id: selectedOrder.id,
+                          trackingNumber: (trackingDraft[selectedOrder.id] ?? selectedOrder.trackingNumber ?? "").trim(),
+                        })
+                      }
+                      className="rounded-md border border-border px-3 py-2 text-sm text-foreground hover:bg-muted"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-2">
+                  <p className="text-muted-foreground text-xs">Tracking Update (Where order is)</p>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={trackingNoteDraft[selectedOrder.id] ?? (selectedOrder as AdminOrder).trackingNote ?? ""}
+                      onChange={(e) => setTrackingNoteDraft((prev) => ({ ...prev, [selectedOrder.id]: e.target.value }))}
+                      placeholder="e.g. Out for delivery in Bangalore"
+                      className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateTrackingNoteMutation.mutate({
+                          id: selectedOrder.id,
+                          trackingNote: (trackingNoteDraft[selectedOrder.id] ?? (selectedOrder as AdminOrder).trackingNote ?? "").trim(),
+                        })
+                      }
+                      className="rounded-md border border-border px-3 py-2 text-sm text-foreground hover:bg-muted"
+                    >
+                      Save
+                    </button>
                   </div>
                 </div>
                 <div className="border-t border-border pt-4">

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearch } from "wouter";
 import { Search, Package, CreditCard, Box, Truck, CheckCircle, XCircle, Loader2 } from "lucide-react";
 
 const STATUS_STEPS = [
@@ -15,21 +16,22 @@ function getStepIndex(status: string): number {
 }
 
 export default function TrackOrderPage() {
+  const search = useSearch();
+  const params = new URLSearchParams(search);
   const [orderNumber, setOrderNumber] = useState("");
   const [order, setOrder] = useState<any>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleTrack = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!orderNumber.trim()) return;
+  const trackById = async (identifier: string) => {
+    if (!identifier.trim()) return;
     setLoading(true);
     setError("");
     setOrder(null);
     try {
-      const res = await fetch(`/api/track/${encodeURIComponent(orderNumber.trim())}`);
+      const res = await fetch(`/api/track/${encodeURIComponent(identifier.trim())}`);
       if (!res.ok) {
-        setError("Order not found. Please check your order number and try again.");
+        setError("Order not found. Please check your order number/tracking ID and try again.");
         return;
       }
       const data = await res.json();
@@ -41,6 +43,20 @@ export default function TrackOrderPage() {
     }
   };
 
+  useEffect(() => {
+    const incoming = params.get("order");
+    if (incoming && incoming.trim()) {
+      const trimmed = incoming.trim();
+      setOrderNumber(trimmed);
+      void trackById(trimmed);
+    }
+  }, [search]);
+
+  const handleTrack = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await trackById(orderNumber);
+  };
+
   const isRefunded = order?.status === "refunded";
   const currentStepIndex = order ? getStepIndex(order.status) : -1;
 
@@ -50,7 +66,7 @@ export default function TrackOrderPage() {
         <div className="text-center max-w-3xl mx-auto mb-12">
           <p className="text-primary text-sm font-bold tracking-widest uppercase mb-4">Order Tracking</p>
           <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-6" data-testid="text-track-order-title">Track Your Order</h1>
-          <p className="text-muted-foreground text-lg">Enter your order number to check the current status of your order.</p>
+          <p className="text-muted-foreground text-lg">Enter your order number or tracking ID to check the current status of your order.</p>
         </div>
 
         <form onSubmit={handleTrack} className="mb-10" data-testid="form-track-order">
@@ -60,7 +76,7 @@ export default function TrackOrderPage() {
                 type="text"
                 value={orderNumber}
                 onChange={(e) => setOrderNumber(e.target.value)}
-                placeholder="Enter your order number (e.g., NVZ-SAMPLE-001)"
+                placeholder="Enter order number or tracking ID (e.g., NVZ-... or TRK-...)"
                 className="flex-1 rounded-md border border-border bg-background px-4 py-2.5 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring focus:border-primary text-sm"
                 data-testid="input-order-number"
               />
@@ -198,6 +214,13 @@ export default function TrackOrderPage() {
               <div className="rounded-md border border-border bg-card p-6" data-testid="tracking-number-card">
                 <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Tracking Number</p>
                 <p className="text-foreground font-mono text-sm" data-testid="text-tracking-number">{order.trackingNumber}</p>
+              </div>
+            )}
+
+            {order.trackingNote && (
+              <div className="rounded-md border border-border bg-card p-6" data-testid="tracking-note-card">
+                <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Latest Tracking Update</p>
+                <p className="text-foreground text-sm">{order.trackingNote}</p>
               </div>
             )}
 

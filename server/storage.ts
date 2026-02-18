@@ -41,6 +41,7 @@ export interface IStorage {
   deleteContactSubmission(id: number): Promise<void>;
 
   getOrderByOrderNumber(orderNumber: string): Promise<Order | undefined>;
+  getOrderByTrackingNumber(trackingNumber: string): Promise<Order | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -159,6 +160,11 @@ export class DatabaseStorage implements IStorage {
 
   async getOrderByOrderNumber(orderNumber: string): Promise<Order | undefined> {
     const [order] = await db.select().from(orders).where(eq(orders.orderNumber, orderNumber));
+    return order;
+  }
+
+  async getOrderByTrackingNumber(trackingNumber: string): Promise<Order | undefined> {
+    const [order] = await db.select().from(orders).where(eq(orders.trackingNumber, trackingNumber));
     return order;
   }
 }

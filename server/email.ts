@@ -3,6 +3,7 @@ import { Resend } from "resend";
 type OrderItem = { name: string; price: string; quantity: number; image?: string };
 type OrderForEmail = {
   orderNumber: string;
+  trackingNumber?: string;
   customerName: string;
   customerEmail: string;
   shippingAddress: string;
@@ -17,6 +18,7 @@ type OrderForEmail = {
 const resendApiKey = process.env.RESEND_API_KEY?.trim();
 const fromEmail = process.env.FROM_EMAIL?.trim();
 const storeName = process.env.STORE_NAME?.trim() || "Novaatoz";
+const storeUrl = (process.env.STORE_URL?.trim() || "https://www.novaatoz.com").replace(/\/+$/, "");
 
 function buildInvoiceHtml(order: OrderForEmail): string {
   const rows = order.items
@@ -38,6 +40,11 @@ function buildInvoiceHtml(order: OrderForEmail): string {
   <h1 style="color:#111">Thank you for your order!</h1>
   <p>Hi ${escapeHtml(order.customerName)},</p>
   <p>Your order <strong>#${escapeHtml(order.orderNumber)}</strong> has been confirmed${order.status === "paid" ? " and paid" : ""}.</p>
+  ${
+    order.trackingNumber
+      ? `<p><strong>Tracking ID:</strong> ${escapeHtml(order.trackingNumber)}<br/><a href="${storeUrl}/track-order?order=${encodeURIComponent(order.trackingNumber)}">Track your order</a></p>`
+      : ""
+  }
   <h2 style="margin-top:24px;font-size:18px">Order summary</h2>
   <table style="width:100%;border-collapse:collapse;margin-top:8px">
     <thead>
@@ -75,6 +82,13 @@ function buildInvoiceText(order: OrderForEmail): string {
     `Thank you for your order, ${order.customerName}!`,
     ``,
     `Order #${order.orderNumber} has been confirmed${order.status === "paid" ? " and paid" : ""}.`,
+    ...(order.trackingNumber
+      ? [
+          ``,
+          `Tracking ID: ${order.trackingNumber}`,
+          `Track: ${storeUrl}/track-order?order=${encodeURIComponent(order.trackingNumber)}`,
+        ]
+      : []),
     ``,
     `Order summary:`,
     itemLines,

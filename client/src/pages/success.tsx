@@ -79,6 +79,12 @@ export default function SuccessPage() {
                             </span>
                         </div>
                         <div className="space-y-3">
+                            {order.trackingNumber && (
+                                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                                    <Package className="h-4 w-4 flex-shrink-0" />
+                                    <span>Tracking ID: <strong className="text-foreground font-mono">{order.trackingNumber}</strong></span>
+                                </div>
+                            )}
                             <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                 <Mail className="h-4 w-4 flex-shrink-0" />
                                 <span>Invoice sent to <strong className="text-foreground">{order.customerEmail}</strong></span>
@@ -98,7 +104,7 @@ export default function SuccessPage() {
                             Continue Shopping
                         </button>
                     </Link>
-                    <Link href={order ? `/track-order?order=${encodeURIComponent(order.orderNumber)}` : "/track-order"}>
+                    <Link href={order ? `/track-order?order=${encodeURIComponent(order.trackingNumber || order.orderNumber)}` : "/track-order"}>
                         <button className="w-full flex items-center justify-center gap-2 rounded-full bg-foreground h-12 text-sm font-medium tracking-wide text-background transition-all hover:bg-foreground/90">
                             Track Order
                             <ArrowRight className="h-4 w-4" />

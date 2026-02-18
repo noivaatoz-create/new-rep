@@ -59,6 +59,16 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, label: string): 
   });
 }
 
+function generateTrackingId(): string {
+  const ts = Date.now().toString(36).toUpperCase();
+  const rand = randomUUID().slice(0, 6).toUpperCase();
+  return `TRK-${ts}-${rand}`;
+}
+
+function getOrderTrackingNoteKey(orderNumber: string): string {
+  return `orderTrackingNote:${orderNumber}`;
+}
+
 async function getProductColorVariantsMap(): Promise<Map<number, ProductColorVariant[]>> {
   const settings = await storage.getSettings();
   const variantsMap = new Map<number, ProductColorVariant[]>();
@@ -420,13 +430,28 @@ export async function registerRoutes(
   });
 
   app.get("/api/orders", requireAdmin, async (_req, res) => {
-    const orders = await storage.getOrders();
-    res.json(orders);
+    const [orders, settings] = await Promise.all([storage.getOrders(), storage.getSettings()]);
+    const trackingNotes = new Map<string, string>();
+    for (const s of settings) {
+      if (s.key.startsWith("orderTrackingNote:")) {
+        trackingNotes.set(s.key.replace("orderTrackingNote:", ""), s.value);
+      }
+    }
+    res.json(
+      orders.map((order) => ({
+        ...order,
+        trackingNote: trackingNotes.get(order.orderNumber) ?? "",
+      })),
+    );
   });
 
   app.post("/api/orders", async (req, res) => {
     const orderNumber = `NVZ-${Date.now().toString(36).toUpperCase()}-${randomUUID().slice(0, 4).toUpperCase()}`;
-    const orderData = { ...req.body, orderNumber };
+    const trackingNumber =
+      typeof req.body?.trackingNumber === "string" && req.body.trackingNumber.trim().length > 0
+        ? req.body.trackingNumber.trim()
+        : generateTrackingId();
+    const orderData = { ...req.body, orderNumber, trackingNumber };
     const parsed = insertOrderSchema.safeParse(orderData);
     if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
     const order = await storage.createOrder(parsed.data);
@@ -434,6 +459,7 @@ export async function registerRoutes(
     // Send invoice email (non-blocking; don't fail order if email fails)
     sendOrderInvoice({
       orderNumber: order.orderNumber,
+      trackingNumber: order.trackingNumber ?? undefined,
       customerName: order.customerName,
       customerEmail: order.customerEmail,
       shippingAddress: order.shippingAddress,
@@ -481,6 +507,16 @@ export async function registerRoutes(
     const order = await storage.updateOrder(id, req.body);
     if (!order) return res.status(404).json({ error: "Order not found" });
     res.json(order);
+  });
+
+  app.patch("/api/orders/:id/tracking-note", requireAdmin, async (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid ID" });
+    const order = await storage.getOrderById(id);
+    if (!order) return res.status(404).json({ error: "Order not found" });
+    const note = typeof req.body?.trackingNote === "string" ? req.body.trackingNote.trim() : "";
+    await storage.upsertSetting(getOrderTrackingNoteKey(order.orderNumber), note);
+    return res.json({ ok: true, trackingNote: note });
   });
 
   app.get("/api/reviews", async (_req, res) => {
@@ -623,14 +659,17 @@ export async function registerRoutes(
   });
 
   app.get("/api/track/:orderNumber", async (req, res) => {
-    const order = await storage.getOrderByOrderNumber(req.params.orderNumber);
+    const identifier = req.params.orderNumber.trim();
+    const order = (await storage.getOrderByOrderNumber(identifier)) ?? (await storage.getOrderByTrackingNumber(identifier));
     if (!order) return res.status(404).json({ error: "Order not found" });
+    const trackingNote = (await storage.getSetting(getOrderTrackingNoteKey(order.orderNumber)))?.value ?? "";
     res.json({
       orderNumber: order.orderNumber,
       status: order.status,
       items: order.items,
       total: order.total,
       trackingNumber: order.trackingNumber,
+      trackingNote,
       createdAt: order.createdAt,
     });
   });
