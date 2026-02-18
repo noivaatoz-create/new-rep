@@ -127,19 +127,34 @@ export async function sendOrderInvoice(order: OrderForEmail): Promise<{ ok: bool
   }
   try {
     const resend = new Resend(resendApiKey);
-    const { data, error } = await resend.emails.send({
+    const payload = {
       from: fromEmail,
       to: [order.customerEmail],
       subject: `Order #${order.orderNumber} confirmed – ${storeName}`,
       html: buildInvoiceHtml(order),
       text: buildInvoiceText(order),
-    });
-    if (error) {
-      console.error("[EMAIL] Resend error:", error);
-      return { ok: false, error: String(error.message ?? error) };
+    };
+    const delays = [0, 300, 900];
+
+    for (let attempt = 0; attempt < delays.length; attempt++) {
+      if (delays[attempt] > 0) {
+        await new Promise((resolve) => setTimeout(resolve, delays[attempt]));
+      }
+      const { data, error } = await resend.emails.send(payload);
+      if (!error) {
+        console.log("[EMAIL] Invoice sent for order", order.orderNumber, "to", order.customerEmail, data?.id);
+        return { ok: true };
+      }
+
+      const message = String(error.message ?? error);
+      const retryable = /Unable to fetch data|timed out|timeout|network|application_error/i.test(message);
+      console.error(`[EMAIL] Resend error (attempt ${attempt + 1}/${delays.length}):`, error);
+      if (!retryable || attempt === delays.length - 1) {
+        return { ok: false, error: message };
+      }
     }
-    console.log("[EMAIL] Invoice sent for order", order.orderNumber, "to", order.customerEmail, data?.id);
-    return { ok: true };
+
+    return { ok: false, error: "Unknown email send failure" };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("[EMAIL] Failed to send invoice:", message, err);
