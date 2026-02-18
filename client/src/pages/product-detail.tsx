@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, Link } from "wouter";
 import { useCartStore } from "@/lib/cart-store";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ProductWithColorVariants, ProductColorVariant } from "@shared/color-variants";
 import type { Review } from "@shared/schema";
 import { Minus, Plus, Truck, ShieldCheck, Droplets, Battery, Waves, Shield, ArrowRight, CheckCircle } from "lucide-react";
@@ -24,10 +24,17 @@ export default function ProductDetailPage() {
   const product = slug ? products?.find((p) => p.slug === slug) : undefined;
   const productReviews = reviews?.filter((r) => r.productId === product?.id) || [];
 
-  const colorVariants = (Array.isArray(product?.colorVariants) ? product.colorVariants : []).filter(
-    (variant: ProductColorVariant) => variant?.images?.length > 0
+  const colorVariants = useMemo(
+    () =>
+      (Array.isArray(product?.colorVariants) ? product.colorVariants : []).filter(
+        (variant: ProductColorVariant) => variant?.images?.length > 0
+      ),
+    [product?.colorVariants]
   );
-  const fallbackImages = [product?.image, ...(Array.isArray(product?.images) ? product.images : [])].filter(Boolean) as string[];
+  const fallbackImages = useMemo(
+    () => [product?.image, ...(Array.isArray(product?.images) ? product.images : [])].filter(Boolean) as string[],
+    [product?.image, product?.images]
+  );
   const activeVariant = colorVariants[selectedColorIndex];
   const galleryImages = (activeVariant?.images?.length ? activeVariant.images : fallbackImages).filter(Boolean);
   const mainImage = selectedImage || galleryImages[0] || product?.image || "";
@@ -39,8 +46,10 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     if (!product) return;
-    setSelectedImage(galleryImages[0] || product.image);
-  }, [product?.id, selectedColorIndex, galleryImages, product?.image]);
+    const variantImages = colorVariants[selectedColorIndex]?.images?.filter(Boolean) || [];
+    const nextImages = variantImages.length > 0 ? variantImages : fallbackImages;
+    setSelectedImage(nextImages[0] || product.image);
+  }, [product?.id, selectedColorIndex, colorVariants, fallbackImages, product?.image]);
 
   if (!slug || isLoading) {
     return (
