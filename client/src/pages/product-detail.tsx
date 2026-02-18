@@ -24,6 +24,24 @@ export default function ProductDetailPage() {
   const product = slug ? products?.find((p) => p.slug === slug) : undefined;
   const productReviews = reviews?.filter((r) => r.productId === product?.id) || [];
 
+  const colorVariants = (Array.isArray(product?.colorVariants) ? product.colorVariants : []).filter(
+    (variant: ProductColorVariant) => variant?.images?.length > 0
+  );
+  const fallbackImages = [product?.image, ...(Array.isArray(product?.images) ? product.images : [])].filter(Boolean) as string[];
+  const activeVariant = colorVariants[selectedColorIndex];
+  const galleryImages = (activeVariant?.images?.length ? activeVariant.images : fallbackImages).filter(Boolean);
+  const mainImage = selectedImage || galleryImages[0] || product?.image || "";
+
+  useEffect(() => {
+    if (!product) return;
+    setSelectedColorIndex(0);
+  }, [product?.id]);
+
+  useEffect(() => {
+    if (!product) return;
+    setSelectedImage(galleryImages[0] || product.image);
+  }, [product?.id, selectedColorIndex, galleryImages, product?.image]);
+
   if (!slug || isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -60,22 +78,6 @@ export default function ProductDetailPage() {
   const specs = (product.specs != null ? product.specs : null) as Record<string, string> | null;
   const features = Array.isArray(product.features) ? product.features : [];
   const whatsInBox = Array.isArray(product.whatsInBox) ? product.whatsInBox : [];
-  const colorVariants = (Array.isArray(product.colorVariants) ? product.colorVariants : []).filter(
-    (variant: ProductColorVariant) => variant?.images?.length > 0
-  );
-
-  const fallbackImages = [product.image, ...(Array.isArray(product.images) ? product.images : [])].filter(Boolean);
-  const activeVariant = colorVariants[selectedColorIndex];
-  const galleryImages = (activeVariant?.images?.length ? activeVariant.images : fallbackImages).filter(Boolean);
-  const mainImage = selectedImage || galleryImages[0] || product.image || "";
-
-  useEffect(() => {
-    setSelectedColorIndex(0);
-  }, [product.id]);
-
-  useEffect(() => {
-    setSelectedImage(galleryImages[0] || product.image);
-  }, [product.id, selectedColorIndex, product.image, product.images, product.colorVariants]);
 
   const specIcons: Record<string, typeof Droplets> = {
     "Pressure": Droplets,
