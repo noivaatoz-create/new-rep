@@ -15,7 +15,7 @@ type OrderForEmail = {
 };
 
 const resendApiKey = process.env.RESEND_API_KEY?.trim();
-const fromEmail = process.env.FROM_EMAIL?.trim() || "Novaatoz <onboarding@resend.dev>";
+const fromEmail = process.env.FROM_EMAIL?.trim();
 const storeName = process.env.STORE_NAME?.trim() || "Novaatoz";
 
 function buildInvoiceHtml(order: OrderForEmail): string {
@@ -103,6 +103,13 @@ export async function sendOrderInvoice(order: OrderForEmail): Promise<{ ok: bool
   if (!resendApiKey) {
     console.log("[EMAIL] RESEND_API_KEY not set, skipping invoice email to", order.customerEmail);
     return { ok: false, error: "RESEND_API_KEY not set" };
+  }
+  if (!fromEmail) {
+    console.log("[EMAIL] FROM_EMAIL not set, skipping invoice email to", order.customerEmail);
+    return { ok: false, error: "FROM_EMAIL not set" };
+  }
+  if (process.env.NODE_ENV === "production" && fromEmail.includes("onboarding@resend.dev")) {
+    console.warn("[EMAIL] FROM_EMAIL uses onboarding@resend.dev in production. Use a verified domain sender.");
   }
   try {
     const resend = new Resend(resendApiKey);
