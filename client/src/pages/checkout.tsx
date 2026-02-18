@@ -116,6 +116,16 @@ export default function CheckoutPage() {
   const { data: paypalConfig } = useQuery<PayPalConfig>({ queryKey: ["/api/paypal/config"] });
   const { data: stripeConfig } = useQuery<StripeConfig>({ queryKey: ["/api/stripe/config"] });
 
+  // Derive Stripe config directly from settings (resilient fallback when /api/stripe/config fails)
+  const stripePublishableKey = (settings?.stripePublicKey || stripeConfig?.publishableKey || "").trim();
+  const stripeConfigEnabled =
+    (settings?.stripeEnabled === "true" && !!stripePublishableKey && !!(settings?.stripeSecretKey || "").trim()) ||
+    stripeConfig?.enabled === true;
+  const effectiveStripeConfig: StripeConfig = {
+    enabled: stripeConfigEnabled,
+    publishableKey: stripePublishableKey,
+  };
+
   const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(null);
   const [stripeCreatingIntent, setStripeCreatingIntent] = useState(false);
   const [stripeRetry, setStripeRetry] = useState(0);
@@ -154,13 +164,13 @@ export default function CheckoutPage() {
   currencyRef.current = settings?.currency || "USD";
 
   const stripePromise = useMemo(
-    () => (stripeConfig?.publishableKey ? loadStripe(stripeConfig.publishableKey) : null),
-    [stripeConfig?.publishableKey]
+    () => (effectiveStripeConfig.publishableKey ? loadStripe(effectiveStripeConfig.publishableKey) : null),
+    [effectiveStripeConfig.publishableKey]
   );
 
   const placeOrderAfterPayPalRef = useRef<(paymentId: string) => void>(() => {});
 
-  const stripeEnabled = settings?.stripeEnabled === "true" || stripeConfig?.enabled === true;
+  const stripeEnabled = effectiveStripeConfig.enabled;
   const paypalEnabled = settings?.paypalEnabled === "true" || paypalConfig?.enabled === true;
   const codEnabled = settings?.codEnabled === "true";
   const noMethodsConfigured = !stripeEnabled && !paypalEnabled && !codEnabled;
@@ -170,7 +180,7 @@ export default function CheckoutPage() {
 
   // Create Stripe Payment Intent when Stripe is selected and shipping complete
   useEffect(() => {
-    if (paymentMethod !== "stripe" || !isShippingComplete || !stripeConfig?.enabled || !stripeConfig?.publishableKey) {
+    if (paymentMethod !== "stripe" || !isShippingComplete || !effectiveStripeConfig.enabled || !effectiveStripeConfig.publishableKey) {
       setStripeClientSecret(null);
       return;
     }
@@ -197,7 +207,7 @@ export default function CheckoutPage() {
     return () => {
       cancelled = true;
     };
-  }, [paymentMethod, isShippingComplete, grandTotal, stripeConfig?.enabled, stripeConfig?.publishableKey, settings?.currency, stripeRetry]);
+  }, [paymentMethod, isShippingComplete, grandTotal, effectiveStripeConfig.enabled, effectiveStripeConfig.publishableKey, settings?.currency, stripeRetry]);
 
   useEffect(() => {
     if (settings) {
@@ -698,16 +708,16 @@ export default function CheckoutPage() {
                       )}
                     </div>
                   </div>
-                ) : paymentMethod === "stripe" && isShippingComplete && (!stripeConfig?.enabled || !stripeConfig?.publishableKey) ? (
+                ) : paymentMethod === "stripe" && isShippingComplete && (!effectiveStripeConfig.enabled || !effectiveStripeConfig.publishableKey) ? (
                   <div className="mt-7 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
                     <p className="text-sm text-amber-800 dark:text-amber-200">
                       Stripe is not set up. Add Stripe keys in Admin → Settings → Payment and turn Stripe on.
                     </p>
                   </div>
-                ) : paymentMethod === "stripe" && isShippingComplete && stripeConfig?.enabled && stripeConfig?.publishableKey && !stripeClientSecret && !stripeCreatingIntent ? (
+                ) : paymentMethod === "stripe" && isShippingComplete && effectiveStripeConfig.enabled && effectiveStripeConfig.publishableKey && !stripeClientSecret && !stripeCreatingIntent ? (
                   <div className="mt-7 space-y-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
                     <p className="text-sm text-amber-800 dark:text-amber-200">
-                      Payment form couldn’t load. Check Stripe keys in Admin → Settings → Payment, or try again.
+                      Payment form couldn't load. Check Stripe keys in Admin → Settings → Payment, or try again.
                     </p>
                     <button
                       type="button"
@@ -717,7 +727,7 @@ export default function CheckoutPage() {
                       Try again
                     </button>
                   </div>
-                ) : paymentMethod === "stripe" && isShippingComplete && stripeConfig?.enabled && stripeConfig?.publishableKey && stripeClientSecret ? (
+                ) : paymentMethod === "stripe" && isShippingComplete && effectiveStripeConfig.enabled && effectiveStripeConfig.publishableKey && stripeClientSecret ? (
                   <div className="mt-7">
                     <Elements
                       stripe={stripePromise}
