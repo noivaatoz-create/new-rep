@@ -4,7 +4,7 @@ import { Link, useLocation } from "wouter";
 import type { Product, Order } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { LayoutDashboard, Package, ShoppingCart, Settings, LogOut, Bell, HelpCircle, Search, AlertTriangle, Calendar, Trash2, RefreshCw, MessageSquare, Images, Home, Sun, Moon, Mail } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Settings, LogOut, Bell, HelpCircle, Search, AlertTriangle, Calendar, Trash2, RefreshCw, MessageSquare, Images, Home, Sun, Moon, Mail, Users } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,6 +37,7 @@ function AdminSidebar({ active }: { active: string }) {
     { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/admin/products", icon: Package, label: "Products" },
     { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
+    { href: "/admin/influencers", icon: Users, label: "Influencers" },
     { href: "/admin/messages", icon: MessageSquare, label: "Messages" },
     { href: "/admin/gallery", icon: Images, label: "Gallery" },
     { href: "/admin/newsletter", icon: Mail, label: "Newsletter" },

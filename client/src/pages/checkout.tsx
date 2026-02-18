@@ -120,6 +120,9 @@ export default function CheckoutPage() {
   const [paypalApproved, setPaypalApproved] = useState(false);
   const [paypalOrderId, setPaypalOrderId] = useState("");
   const [paypalLoading, setPaypalLoading] = useState(false);
+  const [promoCodeInput, setPromoCodeInput] = useState("");
+  const [appliedPromoCode, setAppliedPromoCode] = useState<string | null>(null);
+  const [promoDiscount, setPromoDiscount] = useState(0);
 
   const { data: settings } = useQuery<Record<string, string>>({ queryKey: ["/api/settings"] });
   const { data: paypalConfig } = useQuery<PayPalConfig>({ queryKey: ["/api/paypal/config"] });
@@ -154,9 +157,10 @@ export default function CheckoutPage() {
   const taxRate = parseFloat(settings?.taxRate || "0.08");
   const freeShippingThreshold = parseFloat(settings?.freeShippingThreshold || "75");
   const shippingFlatRate = parseFloat(settings?.shippingFlatRate || "9.99");
-  const shipping = total >= freeShippingThreshold ? 0 : shippingFlatRate;
-  const tax = total * taxRate;
-  const grandTotal = total + shipping + tax;
+  const discountedSubtotal = Math.max(0, total - promoDiscount);
+  const shipping = discountedSubtotal >= freeShippingThreshold ? 0 : shippingFlatRate;
+  const tax = discountedSubtotal * taxRate;
+  const grandTotal = discountedSubtotal + shipping + tax;
 
   // Shipping form validation - payment section lock until shipping is complete
   const isShippingComplete = Boolean(
@@ -240,6 +244,12 @@ export default function CheckoutPage() {
   }, [isShippingComplete, paymentMethod]);
 
   useEffect(() => {
+    const refCode = new URLSearchParams(window.location.search).get("ref");
+    if (!refCode) return;
+    apiRequest("GET", `/api/promo-codes/${encodeURIComponent(refCode)}/resolve`).catch(() => null);
+  }, []);
+
+  useEffect(() => {
     placeOrderAfterPayPalRef.current = async (paymentId: string) => {
       if (items.length === 0) {
         console.error("[PayPal] No items in cart");
@@ -271,6 +281,7 @@ export default function CheckoutPage() {
           shipping: shipping.toFixed(2),
           tax: tax.toFixed(2),
           total: grandTotal.toFixed(2),
+          promoCode: appliedPromoCode,
           paymentProvider: "paypal",
           paymentId,
           status: "paid",
@@ -293,7 +304,7 @@ export default function CheckoutPage() {
         setIsSubmitting(false);
       }
     };
-  }, [form, items, total, shipping, tax, grandTotal, isShippingComplete, clearCart, navigate, toast]);
+  }, [form, items, total, shipping, tax, grandTotal, appliedPromoCode, isShippingComplete, clearCart, navigate, toast]);
 
   useEffect(() => {
     if (paymentMethod !== "paypal") {
@@ -460,10 +471,35 @@ export default function CheckoutPage() {
     shipping: shipping.toFixed(2),
     tax: tax.toFixed(2),
     total: grandTotal.toFixed(2),
+    promoCode: appliedPromoCode,
     paymentProvider: provider,
     paymentId,
     status,
   });
+
+  const applyPromoCode = async () => {
+    const code = promoCodeInput.trim().toUpperCase();
+    if (!code) return;
+    try {
+      const res = await apiRequest("POST", "/api/promo-codes/validate", {
+        code,
+        subtotal: total.toFixed(2),
+      });
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({ error: "Invalid promo code" }));
+        throw new Error(payload.error || "Invalid promo code");
+      }
+      const payload = await res.json();
+      const discount = Number.parseFloat(String(payload.discountAmount || "0"));
+      setPromoDiscount(Number.isFinite(discount) ? Math.max(0, discount) : 0);
+      setAppliedPromoCode(code);
+      toast({ title: "Promo applied", description: `${code} applied successfully.` });
+    } catch (error: any) {
+      setPromoDiscount(0);
+      setAppliedPromoCode(null);
+      toast({ title: "Promo invalid", description: error?.message || "Promo code is invalid.", variant: "destructive" });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -694,9 +730,33 @@ export default function CheckoutPage() {
                   ))}
                 </div>
                 <div className="space-y-3 border-t border-border pt-5">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={promoCodeInput}
+                      onChange={(e) => setPromoCodeInput(e.target.value)}
+                      placeholder="Promo code"
+                      className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                      data-testid="input-promo-code"
+                    />
+                    <button
+                      type="button"
+                      onClick={applyPromoCode}
+                      className="rounded-lg border border-border px-3 py-2 text-xs font-medium"
+                      data-testid="button-apply-promo"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                  {appliedPromoCode && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground font-medium">Promo ({appliedPromoCode})</span>
+                      <span className="text-emerald-500 font-semibold">-${promoDiscount.toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground font-medium">Subtotal</span>
-                    <span className="text-foreground font-semibold">${total.toFixed(2)}</span>
+                    <span className="text-foreground font-semibold">${discountedSubtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground font-medium">Shipping</span>

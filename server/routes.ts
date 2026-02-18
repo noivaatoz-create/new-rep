@@ -3,8 +3,22 @@ import { createServer, type Server } from "http";
 import fs from "fs";
 import path from "path";
 import { put } from "@vercel/blob";
+import { and, desc, eq } from "drizzle-orm";
+import { db } from "./db.js";
 import { storage } from "./storage.js";
-import { insertProductSchema, insertOrderSchema, insertReviewSchema, insertSubscriberSchema, insertContactSubmissionSchema } from "../shared/schema.js";
+import {
+  commissions,
+  influencers,
+  insertContactSubmissionSchema,
+  insertInfluencerSchema,
+  insertOrderSchema,
+  insertProductSchema,
+  insertPromoCodeSchema,
+  insertReviewSchema,
+  insertSubscriberSchema,
+  orders,
+  promoCodes,
+} from "../shared/schema.js";
 import {
   getProductColorVariantsSettingKey,
   parseProductColorVariants,
@@ -18,6 +32,7 @@ import multer from "multer";
 import { sendOrderInvoice } from "./email.js";
 import { pushOrderToVeeqo } from "./veeqo.js";
 import Stripe from "stripe";
+import { createCommissionRecord, getInfluencerPerformance, resolvePromoAndCommission } from "./services/influencer.js";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -67,6 +82,13 @@ function generateTrackingId(): string {
 
 function getOrderTrackingNoteKey(orderNumber: string): string {
   return `orderTrackingNote:${orderNumber}`;
+}
+
+function getReferralContext(req: any): { refCode?: string; refInfluencerId?: number } {
+  const fromSessionCode = typeof req?.session?.refCode === "string" ? req.session.refCode : undefined;
+  const fromSessionId = Number.parseInt(String(req?.session?.refInfluencerId ?? ""), 10);
+  const refInfluencerId = Number.isFinite(fromSessionId) ? fromSessionId : undefined;
+  return { refCode: fromSessionCode, refInfluencerId };
 }
 
 async function getProductColorVariantsMap(): Promise<Map<number, ProductColorVariant[]>> {
@@ -429,6 +451,81 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/promo-codes/:code/resolve", async (req, res) => {
+    const code = String(req.params.code || "").trim().toUpperCase();
+    if (!code) return res.status(400).json({ error: "Promo code is required" });
+
+    const [row] = await db
+      .select({
+        promoCodeId: promoCodes.id,
+        code: promoCodes.code,
+        influencerId: promoCodes.influencerId,
+        active: promoCodes.active,
+        expiresAt: promoCodes.expiresAt,
+        usageLimit: promoCodes.usageLimit,
+        usageCount: promoCodes.usageCount,
+        influencerStatus: influencers.status,
+      })
+      .from(promoCodes)
+      .innerJoin(influencers, eq(influencers.id, promoCodes.influencerId))
+      .where(eq(promoCodes.code, code))
+      .limit(1);
+
+    if (!row) return res.status(404).json({ error: "Promo code not found" });
+    if (!row.active || row.influencerStatus !== "active") return res.status(400).json({ error: "Promo code inactive" });
+    if (row.expiresAt && row.expiresAt <= new Date()) return res.status(400).json({ error: "Promo code expired" });
+    if (row.usageLimit !== null && row.usageCount >= row.usageLimit) return res.status(400).json({ error: "Promo code usage limit reached" });
+
+    if (req.session) {
+      req.session.refCode = row.code;
+      req.session.refInfluencerId = row.influencerId;
+      req.session.refExpiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
+    }
+
+    return res.json({ ok: true, code: row.code, influencerId: row.influencerId });
+  });
+
+  app.post("/api/promo-codes/validate", async (req, res) => {
+    const code = typeof req.body?.code === "string" ? req.body.code.trim().toUpperCase() : "";
+    const subtotal = Number.parseFloat(String(req.body?.subtotal ?? "0"));
+    if (!code) return res.status(400).json({ error: "Promo code is required" });
+
+    const [row] = await db
+      .select({
+        promoCodeId: promoCodes.id,
+        code: promoCodes.code,
+        discountType: promoCodes.discountType,
+        discountValue: promoCodes.discountValue,
+        active: promoCodes.active,
+        expiresAt: promoCodes.expiresAt,
+        usageLimit: promoCodes.usageLimit,
+        usageCount: promoCodes.usageCount,
+        influencerId: promoCodes.influencerId,
+        influencerStatus: influencers.status,
+      })
+      .from(promoCodes)
+      .innerJoin(influencers, eq(influencers.id, promoCodes.influencerId))
+      .where(eq(promoCodes.code, code))
+      .limit(1);
+
+    if (!row) return res.status(404).json({ error: "Invalid promo code" });
+    if (!row.active || row.influencerStatus !== "active") return res.status(400).json({ error: "Promo code inactive" });
+    if (row.expiresAt && row.expiresAt <= new Date()) return res.status(400).json({ error: "Promo code expired" });
+    if (row.usageLimit !== null && row.usageCount >= row.usageLimit) return res.status(400).json({ error: "Promo code usage limit reached" });
+
+    const discountValue = Number.parseFloat(String(row.discountValue));
+    const discountRaw = row.discountType === "percentage" ? subtotal * (discountValue / 100) : discountValue;
+    const discountAmount = Math.max(0, Math.min(Number.isFinite(subtotal) ? subtotal : 0, discountRaw));
+    return res.json({
+      valid: true,
+      code: row.code,
+      influencerId: row.influencerId,
+      discountType: row.discountType,
+      discountValue: row.discountValue,
+      discountAmount: discountAmount.toFixed(2),
+    });
+  });
+
   app.get("/api/orders", requireAdmin, async (_req, res) => {
     const [orders, settings] = await Promise.all([storage.getOrders(), storage.getSettings()]);
     const trackingNotes = new Map<string, string>();
@@ -451,54 +548,115 @@ export async function registerRoutes(
       typeof req.body?.trackingNumber === "string" && req.body.trackingNumber.trim().length > 0
         ? req.body.trackingNumber.trim()
         : generateTrackingId();
-    const orderData = { ...req.body, orderNumber, trackingNumber };
-    const parsed = insertOrderSchema.safeParse(orderData);
-    if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
-    const order = await storage.createOrder(parsed.data);
 
-    // Send invoice email (non-blocking; don't fail order if email fails)
-    sendOrderInvoice({
-      orderNumber: order.orderNumber,
-      trackingNumber: order.trackingNumber ?? undefined,
-      customerName: order.customerName,
-      customerEmail: order.customerEmail,
-      shippingAddress: order.shippingAddress,
-      items: order.items,
-      subtotal: String(order.subtotal),
-      shipping: String(order.shipping),
-      tax: String(order.tax),
-      total: String(order.total),
-      status: order.status,
-    }).catch((err) => console.error("[EMAIL] Invoice send failed:", err));
+    try {
+      const order = await db.transaction(async (tx) => {
+        const items = Array.isArray(req.body?.items) ? req.body.items : [];
+        if (items.length === 0) throw new Error("At least one item is required");
 
-    // Push order to Veeqo if configured (non-blocking)
-    (async () => {
-      try {
-        const settings = await storage.getSettings();
-        const settingsObj: Record<string, string> = {};
-        for (const s of settings) {
-          settingsObj[s.key] = s.value;
+        let subtotal = 0;
+        for (const item of items) {
+          const productId = Number.parseInt(String(item?.productId ?? ""), 10);
+          const quantity = Math.max(1, Number.parseInt(String(item?.quantity ?? "1"), 10));
+          if (!Number.isFinite(productId) || productId <= 0) throw new Error("Invalid item payload");
+          const product = await storage.getProductById(productId);
+          if (!product) throw new Error(`Product ${productId} not found`);
+          subtotal += Number.parseFloat(String(product.price)) * quantity;
         }
-        const result = await pushOrderToVeeqo({
-          orderNumber: order.orderNumber,
-          customerName: order.customerName,
-          customerEmail: order.customerEmail,
-          shippingAddress: order.shippingAddress,
-          items: order.items,
-          paymentProvider: order.paymentProvider ?? null,
-          paymentId: order.paymentId ?? null,
-        }, settingsObj);
-        if (result.ok) {
-          if (result.veeqoOrderId) console.log("[VEEQO] Order pushed:", order.orderNumber, "→ Veeqo ID", result.veeqoOrderId);
-        } else {
-          console.warn("[VEEQO] Push failed:", order.orderNumber, result.error);
-        }
-      } catch (err) {
-        console.error("[VEEQO] Push error:", err);
-      }
-    })();
 
-    res.status(201).json(order);
+        const shipping = Number.parseFloat(String(req.body?.shipping ?? "0"));
+        const tax = Number.parseFloat(String(req.body?.tax ?? "0"));
+        const safeShipping = Number.isFinite(shipping) ? Math.max(0, shipping) : 0;
+        const safeTax = Number.isFinite(tax) ? Math.max(0, tax) : 0;
+
+        const promoCodeInput = typeof req.body?.promoCode === "string" ? req.body.promoCode : undefined;
+        const referralContext = getReferralContext(req);
+        const promo = await resolvePromoAndCommission({
+          tx,
+          promoCodeInput,
+          referral: referralContext,
+          subtotal,
+        });
+
+        const netSubtotal = Math.max(0, subtotal - Number.parseFloat(promo.discountAmount));
+        const total = netSubtotal + safeShipping + safeTax;
+
+        const orderData = {
+          ...req.body,
+          orderNumber,
+          trackingNumber,
+          subtotal: subtotal.toFixed(2),
+          shipping: safeShipping.toFixed(2),
+          tax: safeTax.toFixed(2),
+          total: total.toFixed(2),
+          promoCodeId: promo.promoCodeId,
+          influencerId: promo.influencerId,
+          discountAmount: promo.discountAmount,
+          commissionAmount: promo.commissionAmount,
+        };
+
+        const parsed = insertOrderSchema.safeParse(orderData);
+        if (!parsed.success) throw new Error("Invalid order payload");
+
+        const [createdOrder] = await tx.insert(orders).values(parsed.data).returning();
+        if (!createdOrder) throw new Error("Order creation failed");
+
+        await createCommissionRecord({
+          tx,
+          influencerId: promo.influencerId,
+          orderId: createdOrder.id,
+          commissionAmount: promo.commissionAmount,
+        });
+
+        return createdOrder;
+      });
+
+      // Send invoice email (non-blocking; don't fail order if email fails)
+      sendOrderInvoice({
+        orderNumber: order.orderNumber,
+        trackingNumber: order.trackingNumber ?? undefined,
+        customerName: order.customerName,
+        customerEmail: order.customerEmail,
+        shippingAddress: order.shippingAddress,
+        items: order.items,
+        subtotal: String(order.subtotal),
+        shipping: String(order.shipping),
+        tax: String(order.tax),
+        total: String(order.total),
+        status: order.status,
+      }).catch((err) => console.error("[EMAIL] Invoice send failed:", err));
+
+      // Push order to Veeqo if configured (non-blocking)
+      (async () => {
+        try {
+          const settings = await storage.getSettings();
+          const settingsObj: Record<string, string> = {};
+          for (const s of settings) {
+            settingsObj[s.key] = s.value;
+          }
+          const result = await pushOrderToVeeqo({
+            orderNumber: order.orderNumber,
+            customerName: order.customerName,
+            customerEmail: order.customerEmail,
+            shippingAddress: order.shippingAddress,
+            items: order.items,
+            paymentProvider: order.paymentProvider ?? null,
+            paymentId: order.paymentId ?? null,
+          }, settingsObj);
+          if (result.ok) {
+            if (result.veeqoOrderId) console.log("[VEEQO] Order pushed:", order.orderNumber, "→ Veeqo ID", result.veeqoOrderId);
+          } else {
+            console.warn("[VEEQO] Push failed:", order.orderNumber, result.error);
+          }
+        } catch (err) {
+          console.error("[VEEQO] Push error:", err);
+        }
+      })();
+
+      return res.status(201).json(order);
+    } catch (err: any) {
+      return res.status(400).json({ error: err?.message || "Order creation failed" });
+    }
   });
 
   app.patch("/api/orders/:id", requireAdmin, async (req, res) => {
@@ -587,6 +745,119 @@ export async function registerRoutes(
       settingsObj[s.key] = s.value;
     }
     res.json(settingsObj);
+  });
+
+  app.get("/api/admin/influencers", requireAdmin, async (_req, res) => {
+    const rows = await db.select().from(influencers).orderBy(desc(influencers.createdAt));
+    res.json(rows);
+  });
+
+  app.post("/api/admin/influencers", requireAdmin, async (req, res) => {
+    const parsed = insertInfluencerSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+    const payload = {
+      ...parsed.data,
+      email: String(parsed.data.email).trim().toLowerCase(),
+      updatedAt: new Date(),
+    };
+    const [created] = await db.insert(influencers).values(payload).returning();
+    res.status(201).json(created);
+  });
+
+  app.patch("/api/admin/influencers/:id", requireAdmin, async (req, res) => {
+    const id = Number.parseInt(req.params.id, 10);
+    if (!Number.isFinite(id)) return res.status(400).json({ error: "Invalid influencer id" });
+    const payload = { ...(req.body as Record<string, unknown>), updatedAt: new Date() };
+    const [updated] = await db.update(influencers).set(payload).where(eq(influencers.id, id)).returning();
+    if (!updated) return res.status(404).json({ error: "Influencer not found" });
+    res.json(updated);
+  });
+
+  app.get("/api/admin/promo-codes", requireAdmin, async (_req, res) => {
+    const rows = await db
+      .select({
+        id: promoCodes.id,
+        code: promoCodes.code,
+        influencerId: promoCodes.influencerId,
+        discountType: promoCodes.discountType,
+        discountValue: promoCodes.discountValue,
+        usageLimit: promoCodes.usageLimit,
+        usageCount: promoCodes.usageCount,
+        expiresAt: promoCodes.expiresAt,
+        active: promoCodes.active,
+        createdAt: promoCodes.createdAt,
+        updatedAt: promoCodes.updatedAt,
+        influencerName: influencers.name,
+        influencerEmail: influencers.email,
+      })
+      .from(promoCodes)
+      .innerJoin(influencers, eq(influencers.id, promoCodes.influencerId))
+      .orderBy(desc(promoCodes.createdAt));
+    res.json(rows);
+  });
+
+  app.post("/api/admin/promo-codes", requireAdmin, async (req, res) => {
+    const parsed = insertPromoCodeSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+    const payload = {
+      ...parsed.data,
+      code: String(parsed.data.code).trim().toUpperCase(),
+      updatedAt: new Date(),
+    };
+    const [created] = await db.insert(promoCodes).values(payload).returning();
+    res.status(201).json(created);
+  });
+
+  app.patch("/api/admin/promo-codes/:id", requireAdmin, async (req, res) => {
+    const id = Number.parseInt(req.params.id, 10);
+    if (!Number.isFinite(id)) return res.status(400).json({ error: "Invalid promo code id" });
+    const payload = { ...(req.body as Record<string, unknown>), updatedAt: new Date() };
+    if (typeof payload.code === "string") payload.code = payload.code.trim().toUpperCase();
+    const [updated] = await db.update(promoCodes).set(payload).where(eq(promoCodes.id, id)).returning();
+    if (!updated) return res.status(404).json({ error: "Promo code not found" });
+    res.json(updated);
+  });
+
+  app.get("/api/admin/commissions", requireAdmin, async (req, res) => {
+    const status = typeof req.query.status === "string" ? req.query.status : undefined;
+    const where = status ? and(eq(commissions.status, status as any)) : undefined;
+    const baseQuery = db
+      .select({
+        id: commissions.id,
+        influencerId: commissions.influencerId,
+        orderId: commissions.orderId,
+        commissionAmount: commissions.commissionAmount,
+        status: commissions.status,
+        createdAt: commissions.createdAt,
+        updatedAt: commissions.updatedAt,
+        influencerName: influencers.name,
+        orderNumber: orders.orderNumber,
+      })
+      .from(commissions)
+      .innerJoin(influencers, eq(influencers.id, commissions.influencerId))
+      .innerJoin(orders, eq(orders.id, commissions.orderId))
+      .orderBy(desc(commissions.createdAt));
+    const rows = where ? await baseQuery.where(where) : await baseQuery;
+    res.json(rows);
+  });
+
+  app.patch("/api/admin/commissions/:id/pay", requireAdmin, async (req, res) => {
+    const id = Number.parseInt(req.params.id, 10);
+    if (!Number.isFinite(id)) return res.status(400).json({ error: "Invalid commission id" });
+    const [updated] = await db
+      .update(commissions)
+      .set({ status: "paid", updatedAt: new Date() })
+      .where(eq(commissions.id, id))
+      .returning();
+    if (!updated) return res.status(404).json({ error: "Commission not found" });
+    res.json(updated);
+  });
+
+  app.get("/api/admin/influencers/performance", requireAdmin, async (req, res) => {
+    const from = typeof req.query.from === "string" ? req.query.from : undefined;
+    const to = typeof req.query.to === "string" ? req.query.to : undefined;
+    const rows = await getInfluencerPerformance({ from, to });
+    res.json(rows);
   });
 
   app.get("/api/stripe/config", async (_req, res) => {

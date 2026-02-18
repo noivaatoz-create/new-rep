@@ -27,6 +27,7 @@ import AdminSettings from "@/pages/admin/settings";
 import AdminMessages from "@/pages/admin/messages";
 import AdminGallery from "@/pages/admin/gallery";
 import AdminNewsletter from "@/pages/admin/newsletter";
+import AdminInfluencers from "@/pages/admin/influencers";
 import AdminLogin from "@/pages/admin/login";
 import { AdminGuard } from "@/lib/admin-auth";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -96,6 +97,9 @@ function Router() {
       </Route>
       <Route path="/admin/orders">
         {() => <AdminGuard><AdminOrders /></AdminGuard>}
+      </Route>
+      <Route path="/admin/influencers">
+        {() => <AdminGuard><AdminInfluencers /></AdminGuard>}
       </Route>
       <Route path="/admin/gallery">
         {() => <AdminGuard><AdminGallery /></AdminGuard>}
