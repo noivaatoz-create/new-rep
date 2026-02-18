@@ -85,12 +85,23 @@ function HeroSection() {
             <div className="absolute w-[480px] h-[480px] border border-border/30 rounded-full" />
             <div className="relative z-10 w-full max-w-md aspect-[3/4] rounded-3xl bg-gradient-to-b from-accent/50 to-card p-1 shadow-xl">
               <div className="h-full w-full rounded-[22px] bg-card overflow-hidden relative">
-                <img
+                <video
                   key={current.slug}
-                  alt={current.name}
                   className="h-full w-full object-cover transition-opacity duration-300"
-                  src={current.image}
-                />
+                  src="/videos/hero.mp4"
+                  poster={current.image}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="metadata"
+                >
+                  <img
+                    alt={current.name}
+                    className="h-full w-full object-cover"
+                    src={current.image}
+                  />
+                </video>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                 <div className="absolute bottom-8 left-8 right-8">
                   <div className="flex justify-between items-end gap-4">
