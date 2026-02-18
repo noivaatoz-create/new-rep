@@ -523,6 +523,15 @@ export async function registerRoutes(
     res.json(updatedOrder);
   });
 
+  app.delete("/api/orders/:id", requireAdmin, async (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid ID" });
+    const order = await storage.getOrderById(id);
+    if (!order) return res.status(404).json({ error: "Order not found" });
+    await storage.deleteOrder(id);
+    return res.status(204).send();
+  });
+
   app.patch("/api/orders/:id/tracking-note", requireAdmin, async (req, res) => {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) return res.status(400).json({ error: "Invalid ID" });

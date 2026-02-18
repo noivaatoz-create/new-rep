@@ -80,10 +80,10 @@ function HeroSection() {
               </Link>
             </div>
           </div>
-          <div className="relative lg:h-[550px] flex items-center justify-center">
-            <div className="absolute w-[380px] h-[380px] border border-primary/10 rounded-full" />
-            <div className="absolute w-[480px] h-[480px] border border-border/30 rounded-full" />
-            <div className="relative z-10 w-full max-w-md aspect-[3/4] rounded-3xl bg-gradient-to-b from-accent/50 to-card p-1 shadow-xl">
+          <div className="relative lg:h-[680px] flex items-center justify-center">
+            <div className="absolute w-[460px] h-[460px] border border-primary/10 rounded-full" />
+            <div className="absolute w-[600px] h-[600px] border border-border/30 rounded-full" />
+            <div className="relative z-10 w-full max-w-xl aspect-[3/4] rounded-3xl bg-gradient-to-b from-accent/50 to-card p-1 shadow-xl">
               <div className="h-full w-full rounded-[22px] bg-card overflow-hidden relative">
                 <video
                   key={current.slug}

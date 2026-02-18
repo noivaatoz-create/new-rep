@@ -3,7 +3,7 @@ import { AdminSidebar, AdminHeader } from "./dashboard";
 import type { Order } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Check, Copy, Eye, Package, Search } from "lucide-react";
+import { Check, Copy, Eye, Package, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -72,6 +72,24 @@ export default function AdminOrders() {
     },
     onError: (err: Error) => {
       toast({ title: "Update failed", description: err.message, variant: "destructive" });
+    },
+  });
+
+  const deleteOrderMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await apiRequest("DELETE", `/api/orders/${id}`);
+      if (!res.ok && res.status !== 204) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error || `HTTP ${res.status}`);
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+      toast({ title: "Order deleted", description: "Order removed successfully." });
+    },
+    onError: (err: Error) => {
+      toast({ title: "Delete failed", description: err.message, variant: "destructive" });
     },
   });
 
@@ -282,13 +300,29 @@ export default function AdminOrders() {
                           {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}
                         </td>
                         <td className="p-4">
-                          <button
-                            onClick={() => setSelectedOrder(order)}
-                            className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-                            data-testid={`button-view-order-${order.id}`}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </button>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => setSelectedOrder(order)}
+                              className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                              data-testid={`button-view-order-${order.id}`}
+                              title="View order"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (window.confirm(`Delete order #${order.orderNumber}? This cannot be undone.`)) {
+                                  deleteOrderMutation.mutate(order.id);
+                                }
+                              }}
+                              className="p-1.5 rounded-md hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-colors"
+                              data-testid={`button-delete-order-${order.id}`}
+                              title="Delete order"
+                              disabled={deleteOrderMutation.isPending}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
