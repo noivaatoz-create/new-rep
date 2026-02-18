@@ -292,7 +292,7 @@ export default function AdminProducts() {
                             queryClient.invalidateQueries({ queryKey: ["/api/products"] });
                           }}
                           className="p-1.5 rounded-md hover:bg-muted transition-colors"
-                          title="Hero pe show karein"
+                          title="Show on homepage hero"
                           data-testid={`button-toggle-hero-${product.id}`}
                         >
                           <Layout className={`h-5 w-5 ${"showOnHero" in product && product.showOnHero ? "text-primary fill-primary" : "text-muted-foreground"}`} />
@@ -462,11 +462,11 @@ export default function AdminProducts() {
                   onClick={() => setForm({ ...form, showOnHero: !form.showOnHero })}
                   className="flex items-center gap-2 text-sm"
                   data-testid="button-toggle-show-on-hero"
-                  title="Home hero pe show hoga"
+                  title="Show on homepage hero"
                 >
                   <Layout className={`h-6 w-6 ${form.showOnHero ? "text-primary fill-primary" : "text-muted-foreground"}`} />
                   <span className={form.showOnHero ? "text-primary font-medium" : "text-muted-foreground"}>
-                    {form.showOnHero ? "Hero pe dikhe" : "Hero pe nahi"}
+                    {form.showOnHero ? "Visible in hero" : "Hidden from hero"}
                   </span>
                 </button>
               </div>

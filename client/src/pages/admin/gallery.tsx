@@ -113,7 +113,7 @@ export default function AdminGallery() {
       updateImage(index, data.url);
     } catch (err: any) {
       clearTimeout(timeoutId);
-      const msg = "Image upload nahi ho paya, dobara try karo.";
+      const msg = "Image upload failed. Please try again.";
       toast({ title: "Upload failed", description: msg, variant: "destructive" });
     } finally {
       setUploadingIndex(null);
@@ -125,7 +125,7 @@ export default function AdminGallery() {
     if (cleanImages.length === 0) {
       toast({
         title: "At least 1 image required",
-        description: "Gallery me kam se kam ek image URL hona chahiye.",
+        description: "At least one image URL is required in the gallery.",
         variant: "destructive",
       });
       return;
@@ -146,7 +146,7 @@ export default function AdminGallery() {
                 <div>
                   <h3 className="text-foreground text-base font-semibold">Designed for Perfection Gallery</h3>
                   <p className="text-muted-foreground text-sm">
-                    Home page ke moving images yahan edit, reorder aur upload karo.
+                    Edit, reorder, and upload the moving images shown on the homepage.
                   </p>
                 </div>
               </div>

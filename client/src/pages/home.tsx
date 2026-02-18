@@ -17,7 +17,7 @@ function HeroSection() {
     staleTime: 60_000,
   });
   const { data: settings } = useQuery<Record<string, string>>({ queryKey: ["/api/settings"] });
-  // Hero: sirf ek image — pehle "Hero" toggle wala product, warna featured, warna fallback
+  // Hero: show one product image based on priority (hero toggle, featured, then fallback)
   const showOnHeroList = products?.filter((p) => (p as { showOnHero?: boolean }).showOnHero) ?? [];
   const featured = products?.filter((p) => p.isFeatured) ?? [];
   const rest = products?.filter((p) => !p.isFeatured) ?? [];

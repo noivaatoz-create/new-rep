@@ -91,7 +91,7 @@ export default function SuccessPage() {
                             </div>
                             <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                 <Package className="h-4 w-4" />
-                                <span>Est. delivery: 3-5 business days</span>
+                                <span>Est. delivery: 5-7 business days</span>
                             </div>
                         </div>
                     </div>

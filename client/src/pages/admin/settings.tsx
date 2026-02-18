@@ -776,10 +776,10 @@ export default function AdminSettings() {
                         value={form.heroFallbackImage}
                         onChange={(e) => setForm({ ...form, heroFallbackImage: e.target.value })}
                         className={inputClass}
-                        placeholder="/images/hero-product.png ya full URL"
+                        placeholder="/images/hero-product.png or full URL"
                         data-testid="input-hero-fallback-image"
                       />
-                      <p className="text-muted-foreground text-xs mt-1">Jab hero pe koi product nahi ya fallback dikhe, ye image use hogi.</p>
+                      <p className="text-muted-foreground text-xs mt-1">Used when no product is selected for the hero section.</p>
                     </div>
                   </div>
 
