@@ -1,5 +1,5 @@
 import { useCartStore } from "@/lib/cart-store";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -152,6 +152,11 @@ export default function CheckoutPage() {
   const currencyRef = useRef(settings?.currency || "USD");
   grandTotalRef.current = grandTotal;
   currencyRef.current = settings?.currency || "USD";
+
+  const stripePromise = useMemo(
+    () => (stripeConfig?.publishableKey ? loadStripe(stripeConfig.publishableKey) : null),
+    [stripeConfig?.publishableKey]
+  );
 
   const placeOrderAfterPayPalRef = useRef<(paymentId: string) => void>(() => {});
 
@@ -715,7 +720,7 @@ export default function CheckoutPage() {
                 ) : paymentMethod === "stripe" && isShippingComplete && stripeConfig?.enabled && stripeConfig?.publishableKey && stripeClientSecret ? (
                   <div className="mt-7">
                     <Elements
-                      stripe={loadStripe(stripeConfig.publishableKey)}
+                      stripe={stripePromise}
                       options={{ clientSecret: stripeClientSecret, appearance: { theme: "stripe" } }}
                     >
                       <StripeCheckoutForm
