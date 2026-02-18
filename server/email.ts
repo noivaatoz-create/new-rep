@@ -63,6 +63,34 @@ function buildInvoiceHtml(order: OrderForEmail): string {
 </html>`;
 }
 
+function buildInvoiceText(order: OrderForEmail): string {
+  const itemLines = order.items
+    .map((item) => {
+      const lineTotal = (Number(item.price) * item.quantity).toFixed(2);
+      return `- ${item.name} x${item.quantity} @ $${item.price} = $${lineTotal}`;
+    })
+    .join("\n");
+
+  return [
+    `Thank you for your order, ${order.customerName}!`,
+    ``,
+    `Order #${order.orderNumber} has been confirmed${order.status === "paid" ? " and paid" : ""}.`,
+    ``,
+    `Order summary:`,
+    itemLines,
+    ``,
+    `Subtotal: $${order.subtotal}`,
+    `Shipping: $${order.shipping}`,
+    `Tax: $${order.tax}`,
+    `Total: $${order.total}`,
+    ``,
+    `Shipping address:`,
+    order.shippingAddress,
+    ``,
+    `- ${storeName}`,
+  ].join("\n");
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")
@@ -83,6 +111,7 @@ export async function sendOrderInvoice(order: OrderForEmail): Promise<{ ok: bool
       to: [order.customerEmail],
       subject: `Order #${order.orderNumber} confirmed – ${storeName}`,
       html: buildInvoiceHtml(order),
+      text: buildInvoiceText(order),
     });
     if (error) {
       console.error("[EMAIL] Resend error:", error);
