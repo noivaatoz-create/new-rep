@@ -214,7 +214,7 @@ export default function AdminInfluencers() {
 
   const markCommissionPaid = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest("PATCH", `/api/admin/commissions/${id}/pay`, {});
+      await apiRequest("POST", "/api/admin/commissions/pay", { id });
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [commissionsPath] });

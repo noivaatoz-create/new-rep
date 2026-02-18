@@ -853,6 +853,18 @@ export async function registerRoutes(
     res.json(updated);
   });
 
+  app.post("/api/admin/commissions/pay", requireAdmin, async (req, res) => {
+    const id = Number.parseInt(String(req.body?.id ?? ""), 10);
+    if (!Number.isFinite(id)) return res.status(400).json({ error: "Invalid commission id" });
+    const [updated] = await db
+      .update(commissions)
+      .set({ status: "paid", updatedAt: new Date() })
+      .where(eq(commissions.id, id))
+      .returning();
+    if (!updated) return res.status(404).json({ error: "Commission not found" });
+    res.json(updated);
+  });
+
   app.get("/api/admin/influencers/performance", requireAdmin, async (req, res) => {
     const from = typeof req.query.from === "string" ? req.query.from : undefined;
     const to = typeof req.query.to === "string" ? req.query.to : undefined;
