@@ -129,6 +129,7 @@ export default function CheckoutPage() {
   const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(null);
   const [stripeCreatingIntent, setStripeCreatingIntent] = useState(false);
   const [stripeRetry, setStripeRetry] = useState(0);
+  const [stripeError, setStripeError] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -187,19 +188,24 @@ export default function CheckoutPage() {
     let cancelled = false;
     setStripeCreatingIntent(true);
     setStripeClientSecret(null);
+    setStripeError(null);
     apiRequest("POST", "/api/stripe/create-payment-intent", {
       amount: grandTotal,
       currency: (settings?.currency || "USD").toLowerCase(),
     })
       .then(async (res) => {
         const data = await res.json().catch(() => ({}));
-        if (!cancelled && data.clientSecret) setStripeClientSecret(data.clientSecret);
-        else if (!cancelled && !res.ok && data.error) {
+        if (!cancelled && data.clientSecret) {
+          setStripeClientSecret(data.clientSecret);
+          setStripeError(null);
+        } else if (!cancelled && !res.ok && data.error) {
+          setStripeError(data.error);
           toast({ title: "Stripe error", description: data.error, variant: "destructive" });
         }
       })
-      .catch(() => {
-        if (!cancelled) toast({ title: "Stripe error", description: "Could not start payment. Check Admin → Settings → Stripe keys.", variant: "destructive" });
+      .catch((err) => {
+        const msg = err?.message || "Could not start payment. Check Admin → Settings → Stripe keys.";
+        if (!cancelled) { setStripeError(msg); toast({ title: "Stripe error", description: msg, variant: "destructive" }); }
       })
       .finally(() => {
         if (!cancelled) setStripeCreatingIntent(false);
@@ -717,7 +723,7 @@ export default function CheckoutPage() {
                 ) : paymentMethod === "stripe" && isShippingComplete && effectiveStripeConfig.enabled && effectiveStripeConfig.publishableKey && !stripeClientSecret && !stripeCreatingIntent ? (
                   <div className="mt-7 space-y-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
                     <p className="text-sm text-amber-800 dark:text-amber-200">
-                      Payment form couldn't load. Check Stripe keys in Admin → Settings → Payment, or try again.
+                      {stripeError ? `Payment error: ${stripeError}` : "Payment form couldn't load. Check Stripe keys in Admin → Settings → Payment, or try again."}
                     </p>
                     <button
                       type="button"
