@@ -87,6 +87,7 @@ function Router() {
         {() => <CustomerLayout><TrackOrderPage /></CustomerLayout>}
       </Route>
       <Route path="/admin/login" component={AdminLogin} />
+      <Route path="/nv-c4f7" component={AdminLogin} />
       <Route path="/admin">
         {() => <AdminGuard><AdminDashboard /></AdminGuard>}
       </Route>

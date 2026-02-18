@@ -145,9 +145,7 @@ export function Footer() {
 
         <div className="border-t border-border/60 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-2">
           <p className="text-xs text-muted-foreground">{settings?.copyrightText || "\u00A9 2025 Novaatoz Inc. All rights reserved."}</p>
-          <Link href="/admin/login" className="text-xs text-muted-foreground hover:text-foreground transition-colors" data-testid="link-admin">
-            Admin
-          </Link>
+          <span className="text-xs text-muted-foreground">&nbsp;</span>
         </div>
       </div>
     </footer>
