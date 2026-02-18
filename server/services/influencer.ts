@@ -190,6 +190,15 @@ export async function getInfluencerPerformance(params: { from?: string; to?: str
   const from = params.from ? new Date(params.from) : null;
   const to = params.to ? new Date(params.to) : null;
 
+  // Date inputs come as YYYY-MM-DD. Normalize to full-day bounds so records
+  // on the selected "to" date are not accidentally excluded.
+  if (from && !Number.isNaN(from.getTime())) {
+    from.setHours(0, 0, 0, 0);
+  }
+  if (to && !Number.isNaN(to.getTime())) {
+    to.setHours(23, 59, 59, 999);
+  }
+
   const orderWhere = [sql`${orders.influencerId} = ${influencers.id}`];
   const commissionWhere = [sql`${commissions.influencerId} = ${influencers.id}`];
 
