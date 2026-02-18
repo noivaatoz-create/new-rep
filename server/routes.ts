@@ -811,7 +811,7 @@ export async function registerRoutes(
   app.patch("/api/admin/promo-codes/:id", requireAdmin, async (req, res) => {
     const id = Number.parseInt(req.params.id, 10);
     if (!Number.isFinite(id)) return res.status(400).json({ error: "Invalid promo code id" });
-    const payload = { ...(req.body as Record<string, unknown>), updatedAt: new Date() };
+    const payload: Record<string, unknown> = { ...(req.body as Record<string, unknown>), updatedAt: new Date() };
     if (typeof payload.code === "string") payload.code = payload.code.trim().toUpperCase();
     const [updated] = await db.update(promoCodes).set(payload).where(eq(promoCodes.id, id)).returning();
     if (!updated) return res.status(404).json({ error: "Promo code not found" });
