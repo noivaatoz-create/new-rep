@@ -24,12 +24,13 @@ export default function TrackOrderPage() {
   const [loading, setLoading] = useState(false);
 
   const trackById = async (identifier: string) => {
-    if (!identifier.trim()) return;
+    const normalized = identifier.trim().replace(/^#/, "");
+    if (!normalized) return;
     setLoading(true);
     setError("");
     setOrder(null);
     try {
-      const res = await fetch(`/api/track/${encodeURIComponent(identifier.trim())}`);
+      const res = await fetch(`/api/track/${encodeURIComponent(normalized)}`);
       if (!res.ok) {
         setError("Order not found. Please check your order number/tracking ID and try again.");
         return;
@@ -46,7 +47,7 @@ export default function TrackOrderPage() {
   useEffect(() => {
     const incoming = params.get("order");
     if (incoming && incoming.trim()) {
-      const trimmed = incoming.trim();
+      const trimmed = incoming.trim().replace(/^#/, "");
       setOrderNumber(trimmed);
       void trackById(trimmed);
     }

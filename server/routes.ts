@@ -659,7 +659,7 @@ export async function registerRoutes(
   });
 
   app.get("/api/track/:orderNumber", async (req, res) => {
-    const identifier = req.params.orderNumber.trim();
+    const identifier = req.params.orderNumber.trim().replace(/^#/, "");
     const order = (await storage.getOrderByOrderNumber(identifier)) ?? (await storage.getOrderByTrackingNumber(identifier));
     if (!order) return res.status(404).json({ error: "Order not found" });
     const trackingNote = (await storage.getSetting(getOrderTrackingNoteKey(order.orderNumber)))?.value ?? "";
