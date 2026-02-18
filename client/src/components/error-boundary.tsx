@@ -29,9 +29,14 @@ export class ErrorBoundary extends Component<Props, State> {
         <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
           <div className="text-center max-w-md">
             <h1 className="text-xl font-semibold text-foreground mb-2">Something went wrong</h1>
-            <p className="text-muted-foreground text-sm mb-6">
-              The page couldn’t load. Try refreshing or go back to the shop.
+            <p className="text-muted-foreground text-sm mb-2">
+              The page couldn't load. Try refreshing or go back to the shop.
             </p>
+            {this.state.error && (
+              <p className="text-xs text-red-400 font-mono mb-6 break-all">
+                {this.state.error.message}
+              </p>
+            )}
             <div className="flex gap-3 justify-center">
               <button
                 type="button"
