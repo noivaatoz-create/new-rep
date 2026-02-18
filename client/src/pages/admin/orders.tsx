@@ -3,8 +3,8 @@ import { AdminSidebar, AdminHeader } from "./dashboard";
 import type { Order } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, Package, Truck } from "lucide-react";
-import { useState } from "react";
+import { Check, Copy, Eye, Package, Search } from "lucide-react";
+import { useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 type AdminOrder = Order & { trackingNote?: string };
@@ -15,6 +15,9 @@ export default function AdminOrders() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [trackingDraft, setTrackingDraft] = useState<Record<number, string>>({});
   const [trackingNoteDraft, setTrackingNoteDraft] = useState<Record<number, string>>({});
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
@@ -72,6 +75,41 @@ export default function AdminOrders() {
     },
   });
 
+  const filteredOrders = useMemo(() => {
+    const list = orders ?? [];
+    const q = query.trim().toLowerCase();
+    return list.filter((order) => {
+      const byStatus = statusFilter === "all" || order.status === statusFilter;
+      if (!byStatus) return false;
+      if (!q) return true;
+      const haystack = [
+        order.orderNumber,
+        order.customerName,
+        order.customerEmail,
+        order.trackingNumber ?? "",
+        order.trackingNote ?? "",
+      ]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [orders, query, statusFilter]);
+
+  const getTrackingValue = (order: AdminOrder) => (trackingDraft[order.id] ?? order.trackingNumber ?? "").trim();
+  const getTrackingNoteValue = (order: AdminOrder) => (trackingNoteDraft[order.id] ?? order.trackingNote ?? "").trim();
+  const isTrackingDirty = (order: AdminOrder) => getTrackingValue(order) !== (order.trackingNumber ?? "").trim();
+  const isTrackingNoteDirty = (order: AdminOrder) => getTrackingNoteValue(order) !== (order.trackingNote ?? "").trim();
+
+  const handleCopy = async (value: string, key: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedKey(key);
+      setTimeout(() => setCopiedKey((current) => (current === key ? null : current)), 1500);
+    } catch {
+      toast({ title: "Copy failed", description: "Could not copy value.", variant: "destructive" });
+    }
+  };
+
   return (
     <div className="flex h-screen w-full bg-section-alt overflow-hidden">
       <AdminSidebar active="/admin/orders" />
@@ -79,7 +117,28 @@ export default function AdminOrders() {
         <AdminHeader title="Orders" />
         <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
           <div className="flex items-center justify-between gap-4 flex-wrap">
-            <h3 className="text-foreground text-lg font-semibold">{orders?.length || 0} Orders</h3>
+            <h3 className="text-foreground text-lg font-semibold">{filteredOrders.length} Orders</h3>
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <div className="relative w-full md:w-72">
+                <Search className="h-4 w-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search by order, email, tracking..."
+                  className="w-full rounded-md border border-border bg-background pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+                />
+              </div>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
+              >
+                <option value="all">All statuses</option>
+                {statusOptions.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="bg-card border border-border rounded-md overflow-hidden">
@@ -100,11 +159,23 @@ export default function AdminOrders() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/50">
-                  {orders?.map((order) => {
+                  {filteredOrders.map((order) => {
                     const items = order.items as Array<any>;
                     return (
                       <tr key={order.id} className="hover:bg-white/[0.02] transition-colors" data-testid={`row-order-${order.id}`}>
-                        <td className="p-4 text-foreground text-sm font-medium">#{order.orderNumber}</td>
+                        <td className="p-4 text-foreground text-sm font-medium">
+                          <div className="flex items-center gap-2">
+                            <span>#{order.orderNumber}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleCopy(order.orderNumber, `order-${order.id}`)}
+                              className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
+                              title="Copy order number"
+                            >
+                              {copiedKey === `order-${order.id}` ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+                            </button>
+                          </div>
+                        </td>
                         <td className="p-4">
                           <div>
                             <p className="text-foreground text-sm">{order.customerName}</p>
@@ -122,22 +193,38 @@ export default function AdminOrders() {
                               type="text"
                               value={trackingDraft[order.id] ?? order.trackingNumber ?? ""}
                               onChange={(e) => setTrackingDraft((prev) => ({ ...prev, [order.id]: e.target.value }))}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" && isTrackingDirty(order)) {
+                                  updateTrackingMutation.mutate({ id: order.id, trackingNumber: getTrackingValue(order) });
+                                }
+                              }}
                               placeholder="TRK-..."
                               className="w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-xs text-foreground placeholder:text-muted-foreground"
                               data-testid={`input-tracking-${order.id}`}
                             />
+                            {(trackingDraft[order.id] ?? order.trackingNumber) && (
+                              <button
+                                type="button"
+                                onClick={() => handleCopy((trackingDraft[order.id] ?? order.trackingNumber ?? "").trim(), `trk-${order.id}`)}
+                                className="rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:text-foreground hover:bg-muted"
+                                title="Copy tracking ID"
+                              >
+                                {copiedKey === `trk-${order.id}` ? "Copied" : "Copy"}
+                              </button>
+                            )}
                             <button
                               type="button"
                               onClick={() =>
                                 updateTrackingMutation.mutate({
                                   id: order.id,
-                                  trackingNumber: (trackingDraft[order.id] ?? order.trackingNumber ?? "").trim(),
+                                  trackingNumber: getTrackingValue(order),
                                 })
                               }
-                              className="rounded-md border border-border px-2 py-1 text-xs text-foreground hover:bg-muted"
+                              disabled={!isTrackingDirty(order) || updateTrackingMutation.isPending}
+                              className="rounded-md border border-border px-2 py-1 text-xs text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
                               data-testid={`button-save-tracking-${order.id}`}
                             >
-                              Save
+                              {updateTrackingMutation.isPending ? "Saving..." : "Save"}
                             </button>
                           </div>
                         </td>
@@ -147,6 +234,11 @@ export default function AdminOrders() {
                               type="text"
                               value={trackingNoteDraft[order.id] ?? order.trackingNote ?? ""}
                               onChange={(e) => setTrackingNoteDraft((prev) => ({ ...prev, [order.id]: e.target.value }))}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" && isTrackingNoteDirty(order)) {
+                                  updateTrackingNoteMutation.mutate({ id: order.id, trackingNote: getTrackingNoteValue(order) });
+                                }
+                              }}
                               placeholder="e.g. Reached Mumbai sorting hub"
                               className="w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-xs text-foreground placeholder:text-muted-foreground"
                               data-testid={`input-tracking-note-${order.id}`}
@@ -156,13 +248,14 @@ export default function AdminOrders() {
                               onClick={() =>
                                 updateTrackingNoteMutation.mutate({
                                   id: order.id,
-                                  trackingNote: (trackingNoteDraft[order.id] ?? order.trackingNote ?? "").trim(),
+                                  trackingNote: getTrackingNoteValue(order),
                                 })
                               }
-                              className="rounded-md border border-border px-2 py-1 text-xs text-foreground hover:bg-muted"
+                              disabled={!isTrackingNoteDirty(order) || updateTrackingNoteMutation.isPending}
+                              className="rounded-md border border-border px-2 py-1 text-xs text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
                               data-testid={`button-save-tracking-note-${order.id}`}
                             >
-                              Save
+                              {updateTrackingNoteMutation.isPending ? "Saving..." : "Save"}
                             </button>
                           </div>
                         </td>
@@ -200,11 +293,11 @@ export default function AdminOrders() {
                       </tr>
                     );
                   })}
-                  {(!orders || orders.length === 0) && (
+                  {(filteredOrders.length === 0) && (
                     <tr>
                       <td colSpan={10} className="py-12 text-center">
                         <Package className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
-                        <p className="text-muted-foreground">No orders yet</p>
+                        <p className="text-muted-foreground">{orders?.length ? "No orders match your filters" : "No orders yet"}</p>
                       </td>
                     </tr>
                   )}
