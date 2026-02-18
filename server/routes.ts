@@ -504,9 +504,23 @@ export async function registerRoutes(
   app.patch("/api/orders/:id", requireAdmin, async (req, res) => {
     const id = parseInt(req.params.id);
     if (isNaN(id)) return res.status(400).json({ error: "Invalid ID" });
-    const order = await storage.updateOrder(id, req.body);
+    const order = await storage.getOrderById(id);
     if (!order) return res.status(404).json({ error: "Order not found" });
-    res.json(order);
+
+    const payload = { ...(req.body as Record<string, unknown>) };
+    if (Object.prototype.hasOwnProperty.call(payload, "trackingNote")) {
+      const note = typeof payload.trackingNote === "string" ? payload.trackingNote.trim() : "";
+      await storage.upsertSetting(getOrderTrackingNoteKey(order.orderNumber), note);
+      delete payload.trackingNote;
+    }
+
+    const updatablePayload = payload as Record<string, unknown>;
+    const hasOrderColumnUpdates = Object.keys(updatablePayload).length > 0;
+    const updatedOrder = hasOrderColumnUpdates
+      ? await storage.updateOrder(id, updatablePayload as any)
+      : await storage.getOrderById(id);
+    if (!updatedOrder) return res.status(404).json({ error: "Order not found" });
+    res.json(updatedOrder);
   });
 
   app.patch("/api/orders/:id/tracking-note", requireAdmin, async (req, res) => {

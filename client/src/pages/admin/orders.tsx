@@ -56,7 +56,7 @@ export default function AdminOrders() {
 
   const updateTrackingNoteMutation = useMutation({
     mutationFn: async ({ id, trackingNote }: { id: number; trackingNote: string }) => {
-      const res = await apiRequest("PATCH", `/api/orders/${id}/tracking-note`, { trackingNote });
+      const res = await apiRequest("PATCH", `/api/orders/${id}`, { trackingNote });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err?.error || `HTTP ${res.status}`);
