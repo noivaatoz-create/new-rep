@@ -64,7 +64,13 @@ function HeroSection() {
               </span>
             </h1>
             <p className="text-base text-muted-foreground max-w-md leading-relaxed">
-              Experience clinical-grade oral hygiene wrapped in a design that belongs on your vanity. Precision-engineered for those who appreciate the finer details.
+              NOVAATOZ is a premium oral care brand specializing in cordless water flossers designed for deep cleaning and everyday dental hygiene. Our rechargeable water flossers use high-pressure pulse technology to remove plaque, food debris, and bacteria from between teeth and along the gumline - areas traditional brushing and string floss often miss.
+              <br />
+              <br />
+              Whether you are looking for a portable water flosser for travel, a water flosser for braces, or a rechargeable oral irrigator for sensitive gums, NOVAATOZ delivers powerful performance with comfort and convenience. Our waterproof, USB-rechargeable dental water flossers are ideal for braces, implants, crowns, and daily gum care.
+              <br />
+              <br />
+              Upgrade your oral hygiene routine with a compact, cordless water flosser engineered for effective plaque removal, fresher breath, and healthier gums - all from the comfort of home.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
               <Link href="/shop">
@@ -127,9 +133,9 @@ function HeroSection() {
 
 function ValuePropsSection() {
   const features = [
-    { icon: Waves, title: "Hyper-Pulse Tech", desc: "1200 pulses per minute for deep cleaning between teeth where brushing misses." },
-    { icon: VolumeX, title: "Whisper Quiet", desc: "Operates at less than 50db. Keep your morning routine silent and peaceful." },
-    { icon: Droplets, title: "Waterproof IPX7", desc: "Fully submersible and shower ready design. Built for real life usage." },
+    { icon: Waves, title: "Advanced Hyper-Pulse Technology", desc: "High-Pressure Cordless Water Flosser for Deep Cleaning. Delivers up to 1200 pulses per minute to remove plaque, food debris, and bacteria from between teeth and along the gumline. Designed as a powerful rechargeable water flosser for effective gum care and deep cleaning beyond traditional brushing." },
+    { icon: VolumeX, title: "Ultra-Quiet Operation", desc: "Low-Noise Portable Dental Water Flosser. Engineered to operate below 50dB, this portable water flosser provides powerful cleaning without disturbing your morning or nighttime routine. Ideal for home use, travel, and shared spaces." },
+    { icon: Droplets, title: "Waterproof IPX7 Design", desc: "Shower-Safe Rechargeable Oral Irrigator. Built with IPX7 waterproof protection, this cordless water flosser is fully shower-ready and easy to clean. Perfect for everyday use, braces, and sensitive gum care." },
   ];
 
   return (
@@ -138,8 +144,16 @@ function ValuePropsSection() {
         <div className="mb-16 md:flex md:items-end md:justify-between gap-4">
           <div className="max-w-xl">
             <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">Why Novaatoz</p>
-            <h2 className="text-3xl font-serif tracking-tight text-foreground sm:text-4xl mb-4">Crafted with Purpose</h2>
-            <p className="text-muted-foreground leading-relaxed">Advanced engineering meets thoughtful design. We stripped away the unnecessary to focus on what truly matters.</p>
+            <h2 className="text-3xl font-serif tracking-tight text-foreground sm:text-4xl mb-4">Crafted with Purpose. Designed for Performance.</h2>
+            <p className="text-muted-foreground leading-relaxed">
+              At NOVAATOZ, advanced engineering blends with thoughtful design to deliver a smarter oral care experience. We eliminate unnecessary features and focus on what truly matters - powerful cleaning, comfort, and reliability.
+              <br />
+              <br />
+              Our cordless and rechargeable water flossers are built for modern lifestyles, offering portable convenience without compromising performance. Whether you need a dental water flosser for everyday use, a water flosser for braces, or a deep cleaning oral irrigator for improved gum care, NOVAATOZ delivers precision and effectiveness in every use.
+              <br />
+              <br />
+              From portable water flosser solutions to advanced gum care technology, we create oral hygiene devices designed to make deep cleaning simple, comfortable, and efficient.
+            </p>
           </div>
           <Link href="/shop" className="hidden md:flex items-center gap-2 text-sm font-medium tracking-wide text-foreground mt-4 md:mt-0 hover:text-primary transition-colors" data-testid="link-full-specs">
             View all products <ArrowRight className="h-3.5 w-3.5" />
