@@ -2,8 +2,8 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { AdminSidebar, AdminHeader } from "./dashboard";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useEffect } from "react";
-import { Save, CreditCard, Store, Mail, Layout, Eye, EyeOff, Type, Share2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Save, CreditCard, Store, Mail, Layout, Type, Share2, Upload } from "lucide-react";
 import { SiStripe, SiPaypal, SiFacebook, SiInstagram, SiX, SiYoutube, SiTiktok, SiLinkedin } from "react-icons/si";
 
 interface SettingsForm {
@@ -38,6 +38,8 @@ interface SettingsForm {
   showFooterLinks: string;
   copyrightText: string;
   heroFallbackImage: string;
+  showWhyProductImage: string;
+  whyProductImage: string;
   socialFacebook: string;
   socialInstagram: string;
   socialTwitter: string;
@@ -83,6 +85,8 @@ const defaultForm: SettingsForm = {
   showFooterLinks: "true",
   copyrightText: "",
   heroFallbackImage: "",
+  showWhyProductImage: "true",
+  whyProductImage: "",
   socialFacebook: "",
   socialInstagram: "",
   socialTwitter: "",
@@ -133,6 +137,8 @@ function LoadingSkeleton() {
 export default function AdminSettings() {
   const { toast } = useToast();
   const [form, setForm] = useState<SettingsForm>(defaultForm);
+  const whyImageFileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isUploadingWhyImage, setIsUploadingWhyImage] = useState(false);
 
   const { data: settings, isLoading } = useQuery<Record<string, string>>({
     queryKey: ["/api/settings"],
@@ -172,6 +178,8 @@ export default function AdminSettings() {
         showFooterLinks: settings.showFooterLinks || "true",
         copyrightText: settings.copyrightText || "",
         heroFallbackImage: settings.heroFallbackImage || "",
+        showWhyProductImage: settings.showWhyProductImage || "true",
+        whyProductImage: settings.whyProductImage || "",
         socialFacebook: settings.socialFacebook || "",
         socialInstagram: settings.socialInstagram || "",
         socialTwitter: settings.socialTwitter || "",
@@ -251,6 +259,8 @@ export default function AdminSettings() {
       showFooterLinks: form.showFooterLinks,
       copyrightText: form.copyrightText,
       heroFallbackImage: form.heroFallbackImage,
+      showWhyProductImage: form.showWhyProductImage,
+      whyProductImage: form.whyProductImage,
       socialFacebook: form.socialFacebook,
       socialInstagram: form.socialInstagram,
       socialTwitter: form.socialTwitter,
@@ -270,6 +280,37 @@ export default function AdminSettings() {
 
   const inputClass = "w-full rounded-md border border-border bg-background px-3 py-2 text-foreground text-sm focus:outline-none focus:ring-1 focus:ring-ring placeholder-muted-foreground";
   const labelClass = "block text-sm font-medium text-muted-foreground mb-1.5";
+
+  const uploadWhyImage = async (file: File) => {
+    const formData = new FormData();
+    formData.append("image", file);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+    setIsUploadingWhyImage(true);
+    try {
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Upload failed");
+      setForm((prev) => ({ ...prev, whyProductImage: data.url }));
+      toast({ title: "Image uploaded", description: "Save Appearance to publish it." });
+    } catch {
+      clearTimeout(timeoutId);
+      toast({
+        title: "Upload failed",
+        description: "Could not upload image. Try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploadingWhyImage(false);
+    }
+  };
 
   return (
     <div className="flex h-screen w-full bg-section-alt overflow-hidden">
@@ -780,6 +821,60 @@ export default function AdminSettings() {
                         data-testid="input-hero-fallback-image"
                       />
                       <p className="text-muted-foreground text-xs mt-1">Used when no product is selected for the hero section.</p>
+                    </div>
+                    <div className="rounded-md border border-border bg-background p-3 mt-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <label className="text-sm font-medium text-foreground">Show Why Section Product Image</label>
+                          <p className="text-muted-foreground text-xs">Show/hide image in the whitespace area of Why Novaatoz section.</p>
+                        </div>
+                        <Toggle
+                          value={form.showWhyProductImage}
+                          onToggle={() =>
+                            setForm({
+                              ...form,
+                              showWhyProductImage: form.showWhyProductImage === "true" ? "false" : "true",
+                            })
+                          }
+                          testId="toggle-why-product-image"
+                        />
+                      </div>
+                      <div className="mt-3">
+                        <label className={labelClass}>Why section image URL</label>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <input
+                            type="url"
+                            value={form.whyProductImage}
+                            onChange={(e) => setForm({ ...form, whyProductImage: e.target.value })}
+                            className={inputClass}
+                            placeholder="/uploads/your-image.png or full URL"
+                            data-testid="input-why-product-image"
+                          />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            ref={whyImageFileInputRef}
+                            onChange={async (event) => {
+                              const file = event.target.files?.[0];
+                              if (!file) return;
+                              await uploadWhyImage(file);
+                              event.target.value = "";
+                            }}
+                            data-testid="file-why-product-image"
+                          />
+                          <button
+                            type="button"
+                            className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background px-3 py-2 text-sm"
+                            onClick={() => whyImageFileInputRef.current?.click()}
+                            disabled={isUploadingWhyImage}
+                            data-testid="button-upload-why-product-image"
+                          >
+                            <Upload className="h-4 w-4" />
+                            {isUploadingWhyImage ? "Uploading..." : "Upload"}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
 

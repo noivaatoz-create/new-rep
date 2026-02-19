@@ -132,6 +132,16 @@ function HeroSection() {
 }
 
 function ValuePropsSection() {
+  const { data: settings } = useQuery<Record<string, string>>({ queryKey: ["/api/settings"] });
+  const { data: products } = useQuery<Product[]>({
+    queryKey: ["/api/products"],
+    staleTime: 60_000,
+  });
+  const featured = products?.find((p) => p.isFeatured);
+  const fallback = products?.[0];
+  const whyImage = (settings?.whyProductImage || "").trim() || featured?.image || fallback?.image || "/images/hero-product.png";
+  const showWhyImage = settings?.showWhyProductImage !== "false";
+
   const features = [
     { icon: Waves, title: "Advanced Hyper-Pulse Technology", desc: "High-Pressure Cordless Water Flosser for Deep Cleaning. Delivers up to 1200 pulses per minute to remove plaque, food debris, and bacteria from between teeth and along the gumline. Designed as a powerful rechargeable water flosser for effective gum care and deep cleaning beyond traditional brushing." },
     { icon: VolumeX, title: "Ultra-Quiet Operation", desc: "Low-Noise Portable Dental Water Flosser. Engineered to operate below 50dB, this portable water flosser provides powerful cleaning without disturbing your morning or nighttime routine. Ideal for home use, travel, and shared spaces." },
@@ -141,8 +151,8 @@ function ValuePropsSection() {
   return (
     <section className="py-28 bg-background relative" data-testid="section-value-props">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-16 md:flex md:items-end md:justify-between gap-4">
-          <div className="max-w-xl">
+        <div className="mb-16 grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-8 lg:gap-12 items-start">
+          <div className="max-w-2xl">
             <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">Why Novaatoz</p>
             <h2 className="text-3xl font-serif tracking-tight text-foreground sm:text-4xl mb-4">Crafted with Purpose. Designed for Performance.</h2>
             <p className="text-muted-foreground leading-relaxed">
@@ -154,10 +164,22 @@ function ValuePropsSection() {
               <br />
               From portable water flosser solutions to advanced gum care technology, we create oral hygiene devices designed to make deep cleaning simple, comfortable, and efficient.
             </p>
+            <Link href="/shop" className="mt-6 inline-flex items-center gap-2 text-sm font-medium tracking-wide text-foreground hover:text-primary transition-colors" data-testid="link-full-specs">
+              View all products <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
-          <Link href="/shop" className="hidden md:flex items-center gap-2 text-sm font-medium tracking-wide text-foreground mt-4 md:mt-0 hover:text-primary transition-colors" data-testid="link-full-specs">
-            View all products <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
+          {showWhyImage && (
+            <div className="w-full lg:max-w-[520px] lg:justify-self-end">
+              <div className="overflow-hidden rounded-2xl border border-border/60 bg-card/50 shadow-sm">
+                <img
+                  src={whyImage}
+                  alt="Novaatoz product"
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          )}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {features.map((f, i) => (

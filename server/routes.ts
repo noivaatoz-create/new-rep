@@ -855,6 +855,8 @@ export async function registerRoutes(
       "paypalMode",
       "stripeEnabled",
       "stripePublicKey",
+      "showWhyProductImage",
+      "whyProductImage",
     ]);
     const publicSettings: Record<string, string> = {};
     for (const [key, value] of Object.entries(settingsObj)) {
