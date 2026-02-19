@@ -56,6 +56,42 @@ function requireAdmin(req: any, res: any, next: any) {
   }
 }
 
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const LOGIN_MAX_ATTEMPTS = 8;
+const loginAttempts = new Map<string, { count: number; firstAttemptAt: number }>();
+
+function getLoginAttemptKey(req: any, username: string): string {
+  const ip = String(req.ip || req.headers["x-forwarded-for"] || "unknown");
+  return `${ip}:${username.toLowerCase()}`;
+}
+
+function isLoginRateLimited(req: any, username: string): boolean {
+  const key = getLoginAttemptKey(req, username);
+  const now = Date.now();
+  const attempt = loginAttempts.get(key);
+  if (!attempt) return false;
+  if (now - attempt.firstAttemptAt > LOGIN_WINDOW_MS) {
+    loginAttempts.delete(key);
+    return false;
+  }
+  return attempt.count >= LOGIN_MAX_ATTEMPTS;
+}
+
+function registerFailedLoginAttempt(req: any, username: string): void {
+  const key = getLoginAttemptKey(req, username);
+  const now = Date.now();
+  const current = loginAttempts.get(key);
+  if (!current || now - current.firstAttemptAt > LOGIN_WINDOW_MS) {
+    loginAttempts.set(key, { count: 1, firstAttemptAt: now });
+    return;
+  }
+  loginAttempts.set(key, { ...current, count: current.count + 1 });
+}
+
+function clearLoginAttempts(req: any, username: string): void {
+  loginAttempts.delete(getLoginAttemptKey(req, username));
+}
+
 // Timeout for product/storage operations (Neon/primary DB). Override with env if needed.
 const STORAGE_PRODUCTS_TIMEOUT_MS = Number.parseInt(process.env.STORAGE_PRODUCTS_TIMEOUT_MS ?? "60000", 10);
 
@@ -159,6 +195,30 @@ async function getPayPalAccessToken(clientId: string, clientSecret: string, mode
   return data.access_token as string;
 }
 
+async function verifyStripePaymentStatus(paymentId: string): Promise<boolean> {
+  const settings = await storage.getSettings();
+  const settingsObj: Record<string, string> = {};
+  for (const s of settings) settingsObj[s.key] = s.value;
+  const secretKey = (process.env.STRIPE_SECRET_KEY || settingsObj.stripeSecretKey || "").trim();
+  if (!secretKey) return false;
+  const stripe = new Stripe(secretKey);
+  const intent = await stripe.paymentIntents.retrieve(paymentId);
+  return intent.status === "succeeded";
+}
+
+async function verifyPayPalCaptureStatus(paymentId: string): Promise<boolean> {
+  const { paypalEnabled, clientId, clientSecret, mode } = await getPayPalConfig();
+  if (!paypalEnabled || !clientId || !clientSecret) return false;
+  const accessToken = await getPayPalAccessToken(clientId, clientSecret, mode);
+  const response = await fetch(`${getPayPalApiBase(mode)}/v2/payments/captures/${paymentId}`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!response.ok) return false;
+  const data = await response.json() as { status?: string };
+  return data.status === "COMPLETED";
+}
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
@@ -168,14 +228,23 @@ export async function registerRoutes(
     try {
       const username = typeof req.body?.username === "string" ? req.body.username.trim() : "";
       const password = typeof req.body?.password === "string" ? req.body.password.trim() : "";
-      const adminUser = (process.env.ADMIN_USERNAME || "adminpokemon").trim();
-      const adminPass = (process.env.ADMIN_PASSWORD || "pokemonadmin").trim();
+      if (!username || !password) return res.status(400).json({ error: "Username and password are required" });
+      if (isLoginRateLimited(req, username)) {
+        return res.status(429).json({ error: "Too many login attempts. Please try again later." });
+      }
+      const adminUser = (process.env.ADMIN_USERNAME || (process.env.NODE_ENV === "production" ? "" : "adminpokemon")).trim();
+      const adminPass = (process.env.ADMIN_PASSWORD || (process.env.NODE_ENV === "production" ? "" : "pokemonadmin")).trim();
+      if (process.env.NODE_ENV === "production" && (!adminUser || !adminPass)) {
+        return res.status(500).json({ error: "Admin credentials are not configured" });
+      }
       if (username === adminUser && password === adminPass) {
         if (req.session) {
           req.session.isAdmin = true;
         }
+        clearLoginAttempts(req, username);
         return res.json({ success: true });
       } else {
+        registerFailedLoginAttempt(req, username);
         return res.status(401).json({ error: "Invalid credentials" });
       }
     } catch (err) {
@@ -339,11 +408,11 @@ export async function registerRoutes(
     res.json({ ...product, colorVariants });
   });
 
-  app.get("/api/debug/product-create", (req, res) => {
+  app.get("/api/debug/product-create", requireAdmin, (req, res) => {
     res.json({ isAdmin: req.session?.isAdmin === true, NODE_ENV: process.env.NODE_ENV });
   });
 
-  app.get("/api/debug/db", (_req, res) => {
+  app.get("/api/debug/db", requireAdmin, (_req, res) => {
     const fromNeon = process.env.NEON_DATABASE_URL?.trim();
     const fromDb = process.env.DATABASE_URL?.trim();
     const url = fromNeon || fromDb;
@@ -550,6 +619,25 @@ export async function registerRoutes(
         : generateTrackingId();
 
     try {
+      const requestedPaymentProvider = typeof req.body?.paymentProvider === "string"
+        ? req.body.paymentProvider.toLowerCase().trim()
+        : null;
+      const requestedPaymentId = typeof req.body?.paymentId === "string"
+        ? req.body.paymentId.trim()
+        : null;
+      const requestedStatus = typeof req.body?.status === "string"
+        ? req.body.status.toLowerCase().trim()
+        : "";
+
+      let finalStatus = "pending";
+      if (requestedStatus === "paid" && requestedPaymentProvider && requestedPaymentId) {
+        if (requestedPaymentProvider === "stripe") {
+          finalStatus = (await verifyStripePaymentStatus(requestedPaymentId)) ? "paid" : "pending";
+        } else if (requestedPaymentProvider === "paypal") {
+          finalStatus = (await verifyPayPalCaptureStatus(requestedPaymentId)) ? "paid" : "pending";
+        }
+      }
+
       const order = await db.transaction(async (tx) => {
         const items = Array.isArray(req.body?.items) ? req.body.items : [];
         if (items.length === 0) throw new Error("At least one item is required");
@@ -585,6 +673,9 @@ export async function registerRoutes(
           ...req.body,
           orderNumber,
           trackingNumber,
+          status: finalStatus,
+          paymentProvider: requestedPaymentProvider,
+          paymentId: requestedPaymentId,
           subtotal: subtotal.toFixed(2),
           shipping: safeShipping.toFixed(2),
           tax: safeTax.toFixed(2),
@@ -738,13 +829,38 @@ export async function registerRoutes(
     res.status(204).send();
   });
 
-  app.get("/api/settings", async (_req, res) => {
+  app.get("/api/settings", async (req, res) => {
     const settings = await storage.getSettings();
     const settingsObj: Record<string, string> = {};
     for (const s of settings) {
       settingsObj[s.key] = s.value;
     }
-    res.json(settingsObj);
+    if (req.session?.isAdmin === true) return res.json(settingsObj);
+    const publicKeys = new Set([
+      "storeName",
+      "storeTagline",
+      "storeDescription",
+      "supportEmail",
+      "supportPhone",
+      "supportHours",
+      "storeAddress",
+      "instagramUrl",
+      "facebookUrl",
+      "xUrl",
+      "tiktokUrl",
+      "youtubeUrl",
+      "currency",
+      "paypalEnabled",
+      "paypalClientId",
+      "paypalMode",
+      "stripeEnabled",
+      "stripePublicKey",
+    ]);
+    const publicSettings: Record<string, string> = {};
+    for (const [key, value] of Object.entries(settingsObj)) {
+      if (publicKeys.has(key)) publicSettings[key] = value;
+    }
+    return res.json(publicSettings);
   });
 
   app.get("/api/admin/influencers", requireAdmin, async (_req, res) => {

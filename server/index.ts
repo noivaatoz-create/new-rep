@@ -14,6 +14,11 @@ declare module "http" {
 const app = express();
 app.set("trust proxy", 1);
 const httpServer = createServer(app);
+const isProduction = process.env.NODE_ENV === "production";
+
+if (isProduction && !process.env.SESSION_SECRET) {
+  throw new Error("SESSION_SECRET is required in production");
+}
 
 // Vercel serverless: req.url can be absolute; Express needs path-only for routing
 if (process.env.VERCEL) {
@@ -43,10 +48,10 @@ app.use(express.urlencoded({ limit: "50mb", extended: false }));
 app.use(
   cookieSession({
     name: "session",
-    keys: [process.env.SESSION_SECRET || "novaatoz-admin-secret"],
+    keys: [process.env.SESSION_SECRET || "dev-session-secret-change-me"],
     maxAge: 24 * 60 * 60 * 1000,
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isProduction,
     sameSite: "lax" as const,
     path: "/", // Required for cookies to work on Vercel
   })
@@ -78,9 +83,8 @@ app.use((req, res, next) => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
+      const shouldLogBody = !isProduction && Boolean(capturedJsonResponse);
+      if (shouldLogBody) logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
 
       log(logLine);
     }
