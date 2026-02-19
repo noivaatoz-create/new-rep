@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import fs from "fs";
 import path from "path";
 import { put } from "@vercel/blob";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, gte, lte } from "drizzle-orm";
 import { db } from "./db.js";
 import { storage } from "./storage.js";
 import {
@@ -828,7 +828,25 @@ export async function registerRoutes(
 
   app.get("/api/admin/commissions", requireAdmin, async (req, res) => {
     const status = typeof req.query.status === "string" ? req.query.status : undefined;
-    const where = status ? and(eq(commissions.status, status as any)) : undefined;
+    const fromRaw = typeof req.query.from === "string" ? req.query.from : undefined;
+    const toRaw = typeof req.query.to === "string" ? req.query.to : undefined;
+    const conditions: any[] = [];
+    if (status) conditions.push(eq(commissions.status, status as any));
+    if (fromRaw) {
+      const from = new Date(fromRaw);
+      if (!Number.isNaN(from.getTime())) {
+        from.setHours(0, 0, 0, 0);
+        conditions.push(gte(commissions.createdAt, from));
+      }
+    }
+    if (toRaw) {
+      const to = new Date(toRaw);
+      if (!Number.isNaN(to.getTime())) {
+        to.setHours(23, 59, 59, 999);
+        conditions.push(lte(commissions.createdAt, to));
+      }
+    }
+    const where = conditions.length > 0 ? and(...conditions) : undefined;
     const baseQuery = db
       .select({
         id: commissions.id,
